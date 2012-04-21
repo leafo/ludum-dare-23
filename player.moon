@@ -3,6 +3,16 @@ import timer, keyboard from love
 
 export *
 
+-- go to zero
+dampen = (val, speed, dt) ->
+  amount = speed * dt
+  if val > 0
+    math.max 0, val - amount
+  elseif val < 0
+    math.min 0, val + amount
+  else
+    val
+
 class Player extends Entity
   watch_class self
 
@@ -11,6 +21,9 @@ class Player extends Entity
   }
 
   speed: 100
+  decay_speed: 100*3
+  accel: 20
+
   w: 16
   h: 20
 
@@ -27,6 +40,7 @@ class Player extends Entity
     @bullets = BulletList!
 
     @cur_point = 1
+    @vel = Vec2d!
 
   draw: =>
     @sprite\draw_cell 0, @box.x, @box.y
@@ -42,7 +56,18 @@ class Player extends Entity
   update: (dt) =>
     @bullets\update dt
 
-    @velocity\update unpack movement_vector @speed
+    move = movement_vector(@speed) * dt * @accel
+    @vel += move
+
+    @vel\truncate @speed
+
+    if move[1] == 0
+      @vel[1] = dampen @vel[1], @decay_speed, dt
+
+    if move[2] == 0
+      @vel[2] = dampen @vel[2], @decay_speed, dt
+
+    @velocity\update unpack @vel
 
     if keyboard.isDown @controls.shoot
       t = timer.getTime!
