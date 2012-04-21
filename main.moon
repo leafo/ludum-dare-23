@@ -8,6 +8,8 @@ slow_mode = false
 g = love.graphics
 import timer, keyboard from love
 
+export n = (thing) -> thing.__name or thing.__class.__name
+
 require "guns"
 require "player"
 require "background"

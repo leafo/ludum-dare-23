@@ -9,6 +9,7 @@ export *
 class RandomEnemySpanwer extends Sequence
   new: (@world) =>
     @enemies = ReuseList!
+    @types = { enemies.First, enemies.Second, enemies.Third }
 
     super ->
       wait 1
@@ -18,7 +19,9 @@ class RandomEnemySpanwer extends Sequence
   spawn: => -- need the enemy size
     bg = @world.bg
     x = bg.box.x + math.random bg.box.w
-    @enemies\add enemies.First, @word, x, -20
+
+    cls = @types[math.random(#@types)]
+    @enemies\add cls, @world, x, -20
 
   update: (dt) =>
     super dt
@@ -44,7 +47,9 @@ class Enemy extends Entity
 
   update: (dt) =>
     @box\move unpack @velocity * dt
-    true -- stay alive!
+    v = @world.viewport
+    -- are they in the world?
+    @box\above_of v or v\touches_box @box
 
   draw: =>
     Enemy.sprite\draw_cell @sprite_id, @box.x - @ox, @box.y - @oy
@@ -54,6 +59,20 @@ module "enemies", package.seeall
 
 class First extends Enemy
   sprite_id: 3
+  w: 8
+  h: 9
+  ox: 4
+  oy: 6
+
+class Second extends Enemy
+  sprite_id: 4
+  w: 8
+  h: 9
+  ox: 4
+  oy: 6
+
+class Third extends Enemy
+  sprite_id: 5
   w: 8
   h: 9
   ox: 4

@@ -2,8 +2,6 @@
 import graphics, timer, keyboard from love
 export *
 
-n = (thing) -> thing.__name or thing.__class.__name
-
 class EffectList
   new: =>
     @current_effects = {}
