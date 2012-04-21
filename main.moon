@@ -15,6 +15,7 @@ require "player"
 require "background"
 require "effects"
 require "enemy"
+require "particle"
 
 require "lovekit.screen_snap"
 
@@ -50,6 +51,8 @@ class World
     @bg\draw!
     @enemies\draw!
 
+    Emitter\draw_all!
+
   update: (dt) =>
     @spawner\update dt
     @enemies\update dt
@@ -65,6 +68,8 @@ love.load = ->
 
   w = World viewport
   p = Player w, 50, 100
+
+  emitter = Emitter w, 10, 40
 
   font_image = imgfy"img/font.png"
 
@@ -93,6 +98,7 @@ love.load = ->
     viewport\update dt
     p\update dt
     w\update dt
+    emitter\update dt
 
   love.draw = ->
     viewport\apply!
