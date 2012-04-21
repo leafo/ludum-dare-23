@@ -102,4 +102,18 @@ class Death extends Effect
     graphics.pop!
     super!
 
+-- for the viewport
+class Shake extends Effect
+  new: (duration, @amount) =>
+    super duration
+
+  before: =>
+    t = @p!
+
+    graphics.push!
+    decay = (1 - t) * 2
+    graphics.translate decay * math.sin(t*10), decay * math.cos(t*11)
+
+  after: =>
+    graphics.pop!
 

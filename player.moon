@@ -91,9 +91,10 @@ class Player extends Entity
         @velocity[2] = dampen @velocity[2], @decay_speed, dt
 
     cx, cy = @fit_move unpack @velocity * dt
-    if cx
+    if cx -- hit a wall
       @movement_lock = 0.1
       @effects\add effects.Flash 0.2
+      @world.viewport\shake!
       @velocity[1] = -@velocity[1]
 
     -- see if we are shooting

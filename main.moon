@@ -18,6 +18,24 @@ require "enemy"
 
 require "lovekit.screen_snap"
 
+class EffectViewport extends Viewport
+  new: (...) =>
+    @effects = EffectList!
+    super ...
+
+  shake: =>
+    @effects\add effects.Shake 0.4
+
+  update: (dt) => @effects\update dt
+
+  apply: =>
+    super!
+    e\before @obj for e in *@effects
+
+  pop: =>
+    e\after @obj for e in *@effects
+    super!
+
 class World
   new: (@viewport) =>
     @bg = Background @viewport
@@ -39,7 +57,7 @@ class World
 snapper = nil
 
 love.load = ->
-  viewport = Viewport scale: 4
+  viewport = EffectViewport scale: 4
 
   w = World viewport
   p = Player w, 50, 100
@@ -62,6 +80,8 @@ love.load = ->
     dt /= 3 if slow_mode
 
     reloader\update!
+
+    viewport\update dt
     p\update dt
     w\update dt
 
