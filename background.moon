@@ -4,6 +4,30 @@ import mouse from love
 
 export *
 
+class Paralax
+  speed: 4
+  scale: 0.5
+
+  new: (@img, @viewport, opts={}) =>
+    @img = imgfy @img
+    @img\set_wrap "repeat", "repeat"
+
+    self[k] = v for k,v in pairs opts
+
+    w, h = @img\width!, @img\height!
+    @quad = g.newQuad 0, 0, @viewport.w, @viewport.h, w*@scale, h*@scale
+
+    @offset = 0
+
+  update: (dt) =>
+    @offset += dt * @speed
+    if @offset > @viewport.h
+      @offset -= @viewport.h
+
+  draw: =>
+    @img\drawq @quad, 0, @offset - @viewport.h
+    @img\drawq @quad, 0, @offset
+
 class Background
   watch_class self
 
@@ -15,6 +39,12 @@ class Background
   new: (@viewport) =>
     @tile = imgfy"img/tile.png"
     @tile\set_wrap "repeat", "repeat"
+
+    @stars = Paralax "img/stars.png", @viewport
+    @stars2 = Paralax "img/stars2.png", @viewport, {
+      speed: 8
+      scale: 0.5
+    }
 
     @span = 1
 
@@ -42,13 +72,19 @@ class Background
     @elapsed += dt
     @effect\send "time", @elapsed
 
-    x = @viewport\unproject mouse.getPosition!
+    @stars\update dt
+    @stars2\update dt
+
+    -- x = @viewport\unproject mouse.getPosition!
     -- @padding = 50 * x / @viewport.w
 
     @box = Box @padding + @collide_padding, 0,
       @viewport.w - 2 * (@padding + @collide_padding), @viewport.h
 
   draw: =>
+    @stars\draw!
+    @stars2\draw!
+
     g.setPixelEffect @effect
 
     sy = @height / @tile\width!
