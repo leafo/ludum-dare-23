@@ -36,6 +36,10 @@ class EffectViewport extends Viewport
     e\after @obj for e in *@effects
     super!
 
+    s = @screen.scale
+    g.scale 1/s, 1/s
+
+
 class World
   new: (@viewport) =>
     @bg = Background @viewport
@@ -61,6 +65,11 @@ love.load = ->
 
   w = World viewport
   p = Player w, 50, 100
+
+  font_image = imgfy"img/font.png"
+
+  font = g.newImageFont font_image.tex, " 1234567890"
+  g.setFont font
 
   love.keypressed = (key, code) ->
     switch key
@@ -92,7 +101,6 @@ love.load = ->
     p\draw!
 
     g.print tostring(timer.getFPS!), 2, 2
-
     viewport\pop!
 
     snapper\tick! if snapper
