@@ -11,23 +11,15 @@ import timer, keyboard from love
 require "guns"
 require "player"
 require "background"
+require "lovekit.screen_snap"
 
 class World
   collides: => false
 
+snapper = nil
+
 love.load = ->
   viewport = Viewport scale: 4
-
-  effect = g.newPixelEffect [[
-    extern number time;
-
-    vec4 effect(vec4 color, sampler2D tex, vec2 st, vec2 pixel_coords) {
-      float y = st.y - 0.5; // center coordinate system
-      y /= (st.x * 0.5 + 0.5);
-      y += 0.5;
-      return texture2D(tex, vec2(1 - st.x, y - time));
-    }
-  ]]
 
   w = World!
   p = Player w, 50, 100
@@ -36,6 +28,13 @@ love.load = ->
   love.keypressed = (key, code) ->
     switch key
       when "escape" then os.exit!
+      when "x" -- cool
+        if snapper
+          slow_mode = false
+          snapper = nil
+        else
+          slow_mode = true
+          snapper = ScreenSnap!
       when "s"
         slow_mode = not slow_mode
         print "slow mode:", slow_mode
@@ -54,4 +53,6 @@ love.load = ->
     p\draw!
 
     viewport\pop!
+
+    snapper\tick! if snapper
 

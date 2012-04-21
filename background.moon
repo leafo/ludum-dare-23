@@ -24,7 +24,7 @@ class Background
         y /= (x * 0.5 + 0.5);
         y += 0.5;
 
-        return texture2D(tex, vec2(x, y - time));
+        return texture2D(tex, vec2(x, y*4 - time)) * vec4(vec3(x), 1);
       }
     ]]
 
@@ -39,11 +39,11 @@ class Background
 
     -- left
     @effect\send "flip", 1
-    @tile\draw 0, -25, 0, 1, sy
+    @tile\draw 0, -25, 0, 0.8, sy
 
     -- right
-    @effect\send "flip", 0
-    @tile\draw @viewport.w - @tile\width!, -25, 0, 1, sy
+    -- @effect\send "flip", 0
+    @tile\draw @viewport.w, -25, 0, -0.8, sy
 
     g.setPixelEffect!
 
