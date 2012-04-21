@@ -1,19 +1,18 @@
 require "moon"
 
 require "lovekit.all"
--- reloader = require "lovekit.reloader"
+reloader = require "lovekit.reloader"
+
+slow_mode = false
 
 g = love.graphics
+import timer, keyboard from love
+
+require "guns"
+require "player"
 
 class World
   collides: => false
-
-class Player extends Entity
-  speed: 100
-
-  update: (dt) =>
-    @velocity\update unpack movement_vector @speed
-    super dt
 
 love.load = ->
   viewport = Viewport scale: 4
@@ -24,8 +23,14 @@ love.load = ->
   love.keypressed = (key, code) ->
     switch key
       when "escape" then os.exit!
+      when "s"
+        slow_mode = not slow_mode
+        print "slow mode:", slow_mode
 
   love.update = (dt) ->
+    dt /= 3 if slow_mode
+
+    reloader\update!
     p\update dt
 
   love.draw = ->
@@ -33,7 +38,5 @@ love.load = ->
 
     p\draw!
 
-    g.print "hello world", 10, 10
     viewport\pop!
-
 
