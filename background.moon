@@ -28,6 +28,25 @@ class Paralax
     @img\drawq @quad, 0, @offset - @viewport.h
     @img\drawq @quad, 0, @offset
 
+class MultiParalax extends Paralax
+  new: (imgs, viewport, opts) =>
+    @imgs = for img in *imgs
+      with imgfy(img)
+        \set_wrap "repeat", "repeat"
+
+    super @imgs[1], viewport, opts
+    @img2 = @imgs[2]
+
+  update: (dt) =>
+    @offset += dt * @speed
+    if @offset > @viewport.h
+      @offset -= @viewport.h
+      @img, @img2 = @img2, @img
+
+  draw: =>
+    @img\drawq @quad, 0, @offset - @viewport.h
+    @img2\drawq @quad, 0, @offset
+
 class Background
   watch_class self
 
@@ -46,7 +65,10 @@ class Background
       scale: 0.5
     }
 
-    @terrain = Paralax "img/terrain1.png", @viewport, {
+    @terrain = MultiParalax {
+      "img/terrain1.png"
+      "img/terrain2.png"
+    }, @viewport, {
       speed: 32
     }
 
