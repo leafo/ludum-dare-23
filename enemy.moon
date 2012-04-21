@@ -57,7 +57,6 @@ class Enemy extends Entity
     -- are they in the world?
     @box\above_of v or v\touches_box @box
 
-
   take_hit: (bullet) =>
     @health -= bullet.damage
     if @health < 0

@@ -32,7 +32,7 @@ class Background
   watch_class self
 
   height: 200
-  padding: 10
+  padding: 3
 
   collide_padding: 2
 
@@ -44,6 +44,10 @@ class Background
     @stars2 = Paralax "img/stars2.png", @viewport, {
       speed: 8
       scale: 0.5
+    }
+
+    @terrain = Paralax "img/terrain1.png", @viewport, {
+      speed: 32
     }
 
     @span = 1
@@ -60,7 +64,7 @@ class Background
         if (persp) y /= (x * 0.5 + 0.5);
         y += 0.5;
 
-        return texture2D(tex, vec2(x, y*4 - time)) * vec4(x); // vec4(vec3(x), 1);
+        return texture2D(tex, vec2(x, y*4 - time)) * vec4(vec3(x), sqrt(x));
       }
     ]]
 
@@ -74,6 +78,7 @@ class Background
 
     @stars\update dt
     @stars2\update dt
+    @terrain\update dt
 
     -- x = @viewport\unproject mouse.getPosition!
     -- @padding = 50 * x / @viewport.w
@@ -84,6 +89,8 @@ class Background
   draw: =>
     @stars\draw!
     @stars2\draw!
+
+    @terrain\draw!
 
     g.setPixelEffect @effect
 
