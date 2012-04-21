@@ -41,7 +41,7 @@ class Player extends Entity
     @sprite = Spriter imgfy"img/sprite.png", 16, 20
     @last_shot = 0
     @bullets = ReuseList!
-    @effects = EffectList!
+    @effects = EffectList self
 
     @cur_point = 1
 
@@ -64,8 +64,18 @@ class Player extends Entity
 
   update: (dt) =>
     @bullets\update dt, @world
+
+    -- see if enemies are hit
+    for e in *@world.enemies
+      if e.alive
+        for b in *@bullets
+          if b.alive and e.health > 0 and b\touches_box e.box
+            e\take_hit b
+            b.alive = false
+
     @effects\update dt
 
+    -- movement
     @movement_lock = math.max 0, @movement_lock - dt
 
     if @movement_lock == 0

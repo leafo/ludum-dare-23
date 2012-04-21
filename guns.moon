@@ -5,14 +5,14 @@ export *
 
 class Bullet extends Box
   self.sprite = nil
-  dead: true
   vel: Vec2d 0, -140
 
   ox: 1
   oy: 2
 
+  damage: 166
+
   new: (x, y) =>
-    @dead = false
     if not Bullet.sprite
       Bullet.sprite = with Spriter imgfy"img/sprite.png", 16, 20
         .oy = 20
@@ -27,4 +27,8 @@ class Bullet extends Box
 
   draw: =>
     @anim\draw @x - @ox, @y - @oy
+
+  hit_enemy: =>
+    @alive = false
+
 

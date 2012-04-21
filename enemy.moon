@@ -7,28 +7,21 @@ export *
 --   nil
 
 class RandomEnemySpanwer extends Sequence
-  new: (@world) =>
-    @enemies = ReuseList!
+  new: (@world, @enemy_list) =>
     @types = { enemies.First, enemies.Second, enemies.Third }
 
     super ->
-      wait 1
+      wait 0.5
       @spawn!
       again!
 
   spawn: => -- need the enemy size
     bg = @world.bg
-    x = bg.box.x + math.random bg.box.w
+    x = bg.box.x + 5 + math.random bg.box.w - 5
 
     cls = @types[math.random(#@types)]
-    @enemies\add cls, @world, x, -20
 
-  update: (dt) =>
-    super dt
-    @enemies\update dt
-
-  draw: =>
-    @enemies\draw!
+    @enemy_list\add cls, @world, x - math.floor(cls.w/2) , -20
 
 class Enemy extends Entity
   watch_class self
@@ -45,14 +38,37 @@ class Enemy extends Entity
     super w, x, y
     @velocity = Vec2d 0, 50
 
+    @health = 100
+
+    if @effects
+      @effects\clear self
+    else
+      @effects = EffectList self
+
   update: (dt) =>
+    @effects\update dt
+
     @box\move unpack @velocity * dt
     v = @world.viewport
+
+    if @health < 0 and #@effects == 0
+      return false
+
     -- are they in the world?
     @box\above_of v or v\touches_box @box
 
+
+  take_hit: (bullet) =>
+    @health -= bullet.damage
+    if @health < 0
+      @velocity[2] /= 2
+      @effects\add effects.Death 1.0
+    else
+      @effects\add effects.Flash 0.1
+
   draw: =>
-    Enemy.sprite\draw_cell @sprite_id, @box.x - @ox, @box.y - @oy
+    @effects\apply ->
+      Enemy.sprite\draw_cell @sprite_id, @box.x - @ox, @box.y - @oy
     -- @box\outline!
 
 module "enemies", package.seeall

@@ -3,11 +3,19 @@ import graphics, timer, keyboard from love
 export *
 
 class EffectList
-  new: =>
+  watch_class self
+
+  new: (@obj) =>
     @current_effects = {}
 
-  add: (effect) =>
+  clear: (@obj) =>
+    for k in pairs @current_effects
+      @current_effects[k] = nil
 
+    for i=1,#self
+      self[i] = nil
+
+  add: (effect) =>
     existing = @current_effects[effect.__class]
     if existing
       effect\replace self[existing]
@@ -24,9 +32,9 @@ class EffectList
         table.remove self, i
 
   apply: (fn) =>
-    e\before! for e in *self
+    e\before @obj for e in *self
     fn!
-    e\after! for e in *self
+    e\after @obj for e in *self
 
 class Effect
   new: (@duration) =>
@@ -41,17 +49,17 @@ class Effect
 
   replace: (other) => -- called when replacing existing of same type
 
-  before: =>
-  after: =>
+  before: => @tmp_color = {graphics.getColor!}
+  after: => graphics.setColor @tmp_color
 
 module "effects", package.seeall
 
 class Flash extends Effect
-  new: (duration, @color={255,64,64}) =>
+  new: (duration, @color={255,0,0}) =>
     super duration
 
   before: =>
-    @tmp_color = {graphics.getColor!}
+    super!
     t = @p!
 
     graphics.setColor {
@@ -60,10 +68,38 @@ class Flash extends Effect
       @color[3] * (1 - t) + 255 * t
     }
 
-  after: =>
-    graphics.setColor @tmp_color
-
-class Fade
+class Fade extends Effect
   new: (duration, @color) =>
     super duration
+
+class Death extends Effect
+  new: (...) =>
+    super ...
+    @dir = math.random 2
+
+  before: (o) =>
+    super!
+    t = @p!
+
+    ox, oy = o.box\center!
+
+    c = (1-t)*255
+    graphics.setColor 255,c,c,c
+    graphics.push!
+
+    graphics.translate ox, oy -- move back
+
+    r = t*math.pi/1.5
+    r = -r if @dir == 2
+    graphics.rotate r
+
+    ss = (1 - t) / 2 + 0.5
+    graphics.scale ss, ss
+
+    graphics.translate -ox, -oy -- move to zero
+
+  after: =>
+    graphics.pop!
+    super!
+
 

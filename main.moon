@@ -21,9 +21,17 @@ require "lovekit.screen_snap"
 class World
   new: (@viewport) =>
     @bg = Background @viewport
+    @enemies = ReuseList!
+    @spawner = RandomEnemySpanwer self, @enemies
 
-  draw: => @bg\draw!
-  update: (dt) => @bg\update dt
+  draw: =>
+    @bg\draw!
+    @enemies\draw!
+
+  update: (dt) =>
+    @spawner\update dt
+    @enemies\update dt
+    @bg\update dt
 
   collides: (thing) =>
     @bg\collides thing
@@ -35,7 +43,6 @@ love.load = ->
 
   w = World viewport
   p = Player w, 50, 100
-  e = RandomEnemySpanwer w
 
   love.keypressed = (key, code) ->
     switch key
@@ -57,14 +64,12 @@ love.load = ->
     reloader\update!
     p\update dt
     w\update dt
-    e\update dt
 
   love.draw = ->
     viewport\apply!
 
     w\draw!
     p\draw!
-    e\draw!
 
     g.print tostring(timer.getFPS!), 2, 2
 
