@@ -40,7 +40,7 @@ class Player extends Entity
     super ...
     @sprite = Spriter imgfy"img/sprite.png", 16, 20
     @last_shot = 0
-    @bullets = BulletList!
+    @bullets = ReuseList!
     @effects = EffectList!
 
     @cur_point = 1
@@ -57,13 +57,13 @@ class Player extends Entity
 
   shoot: =>
     pt = @shoot_points[@cur_point]
-    @bullets\create_bullet @box.x + pt[1], @box.y + pt[2]
+    @bullets\add Bullet, @box.x + pt[1], @box.y + pt[2]
 
     @cur_point += 1
     @cur_point = 1  if @cur_point > #@shoot_points
 
   update: (dt) =>
-    @bullets\update dt
+    @bullets\update dt, @world
     @effects\update dt
 
     @movement_lock = math.max 0, @movement_lock - dt

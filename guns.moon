@@ -3,30 +3,6 @@ g = love.graphics
 
 export *
 
-class BulletList
-  new: (@cls=Bullet) =>
-    @dead_list = {}
-
-  update: (dt) =>
-    for b in *self
-      b\update dt unless b.dead
-  
-  draw: =>
-    for b in *self
-      b\draw! unless b.dead
-
-  append: (b) =>
-    with b
-      self[#self + 1] = b
-
-  create_bullet: (...) =>
-    top = table.remove @dead_list
-    if top
-      @cls.__init top, ...
-      top
-    else
-      @append self.cls ...
-
 class Bullet extends Box
   self.sprite = nil
   dead: true
@@ -44,9 +20,10 @@ class Bullet extends Box
     @anim = @anim or Animator Bullet.sprite, {0, 1, 2}, 0.2
     super x, y, 3, 8
 
-  update: (dt) =>
+  update: (dt, world) =>
     @move unpack @vel * dt
     @anim\update dt
+    world.viewport\contains_box self
 
   draw: =>
     @anim\draw @x - @ox, @y - @oy
