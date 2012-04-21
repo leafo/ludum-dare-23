@@ -30,7 +30,7 @@ class BulletList
 class Bullet extends Box
   self.sprite = nil
   dead: true
-  vel: Vec2d 0, -100
+  vel: Vec2d 0, -140
 
   ox: 1
   oy: 2
