@@ -33,7 +33,7 @@ class Player extends Entity
   fire_rate: 0.3
 
   shoot_points: {
-    {2,8}, {11, 8}
+    {0,-2}, {9, -2}
   }
 
   new: (...) =>
@@ -48,10 +48,11 @@ class Player extends Entity
     @movement_lock = 0
 
   draw: =>
+    @bullets\draw!
+
     @effects\apply ->
       @sprite\draw_cell 0, @box.x - @ox, @box.y - @oy
 
-    @bullets\draw!
     -- @box\outline!
 
   shoot: =>
