@@ -24,8 +24,11 @@ class Player extends Entity
   decay_speed: 100*3
   accel: 20
 
-  w: 16
-  h: 20
+  w: 12
+  h: 12
+
+  ox: 2
+  oy: 8
 
   fire_rate: 0.3
 
@@ -40,11 +43,14 @@ class Player extends Entity
     @bullets = BulletList!
 
     @cur_point = 1
-    @vel = Vec2d!
+
+    @movement_lock = 0
 
   draw: =>
-    @sprite\draw_cell 0, @box.x, @box.y
+    @sprite\draw_cell 0, @box.x - @ox, @box.y - @oy
     @bullets\draw!
+
+    @box\outline!
 
   shoot: =>
     pt = @shoot_points[@cur_point]
@@ -56,23 +62,29 @@ class Player extends Entity
   update: (dt) =>
     @bullets\update dt
 
-    move = movement_vector(@speed) * dt * @accel
-    @vel += move
+    @movement_lock = math.max 0, @movement_lock - dt
 
-    @vel\truncate @speed
+    if @movement_lock == 0
+      move = movement_vector(@speed) * dt * @accel
+      @velocity += move
 
-    if move[1] == 0
-      @vel[1] = dampen @vel[1], @decay_speed, dt
+      @velocity\truncate @speed
 
-    if move[2] == 0
-      @vel[2] = dampen @vel[2], @decay_speed, dt
+      if move[1] == 0
+        @velocity[1] = dampen @velocity[1], @decay_speed, dt
 
-    @velocity\update unpack @vel
+      if move[2] == 0
+        @velocity[2] = dampen @velocity[2], @decay_speed, dt
 
+    cx, cy = @fit_move unpack @velocity * dt
+    if cx
+      @movement_lock = 0.1
+      @velocity[1] = -@velocity[1]
+
+    -- see if we are shooting
     if keyboard.isDown @controls.shoot
       t = timer.getTime!
       if t - @last_shot > @fire_rate
         @shoot!
         @last_shot = t
 
-    super dt

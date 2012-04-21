@@ -5,8 +5,12 @@ import mouse from love
 export *
 
 class Background
+  watch_class self
+
   height: 200
   padding: 10
+
+  collide_padding: 2
 
   new: (@viewport) =>
     @tile = imgfy"img/tile.png"
@@ -30,12 +34,19 @@ class Background
       }
     ]]
 
+  collides: (thing) =>
+    return false unless @box
+    not @box\contains_box thing.box
+
   update: (dt) =>
     @elapsed += dt
     @effect\send "time", @elapsed
 
     x = @viewport\unproject mouse.getPosition!
-    @padding = 50 * x / @viewport.w
+    -- @padding = 50 * x / @viewport.w
+
+    @box = Box @padding + @collide_padding, 0,
+      @viewport.w - 2 * (@padding + @collide_padding), @viewport.h
 
   draw: =>
     g.setPixelEffect @effect
@@ -44,8 +55,6 @@ class Background
     sx = (1 - @padding / 50) * 0.8
 
     @effect\send "persp", 1
-
-
 
     -- left
     @tile\draw @padding, -25, 0, sx, sy
@@ -59,4 +68,6 @@ class Background
     @tile\draw @viewport.w - @padding, -25, 0, 1, sy
 
     g.setPixelEffect!
+
+    @box\outline!
 

@@ -14,16 +14,22 @@ require "background"
 require "lovekit.screen_snap"
 
 class World
-  collides: => false
+  new: (@viewport) =>
+    @bg = Background @viewport
+
+  draw: => @bg\draw!
+  update: (dt) => @bg\update dt
+
+  collides: (thing) =>
+    @bg\collides thing
 
 snapper = nil
 
 love.load = ->
   viewport = Viewport scale: 4
 
-  w = World!
+  w = World viewport
   p = Player w, 50, 100
-  b = Background viewport
 
   love.keypressed = (key, code) ->
     switch key
@@ -44,12 +50,12 @@ love.load = ->
 
     reloader\update!
     p\update dt
-    b\update dt
+    w\update dt
 
   love.draw = ->
     viewport\apply!
 
-    b\draw!
+    w\draw!
     p\draw!
 
     viewport\pop!
