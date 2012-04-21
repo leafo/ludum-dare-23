@@ -43,17 +43,27 @@ class Particle
 
 class Emitter
   self.draw_list = nil
+  self.emitter_list = nil
 
   self.draw_all = =>
     if @draw_list
       @draw_list\draw!
       graphics.setColor 255,255,255,255
 
+  self.add = (cls, ...) =>
+    @emitter_list = ReuseList! if not @emitter_list
+    @emitter_list\add cls, ...
+
+  self.update_all = (dt, world) =>
+    @emitter_list\update dt
+    @draw_list\update dt, world
+
   rate: 0.1
   dir: 0
   fan: math.pi/3
 
   accel: 200
+  amount: 15 -- how many particles to spawn before death
 
   new: (@world, @x, @y, @particle_cls=Particle) =>
     if not Emitter.draw_list
@@ -62,10 +72,12 @@ class Emitter
     @time = @rate
 
   spawn: =>
+    return if @amount == 0 -- no more particles!
     dir = @dir + (math.random! - 0.5) * @fan
     dx, dy = math.cos(dir), math.sin(dir)
 
     Emitter.draw_list\add @particle_cls, @x, @y, 0, 0, dx*100, dy*100
+    @amount -= 1
 
   update: (dt) =>
     @time += dt
@@ -74,13 +86,10 @@ class Emitter
       @spawn!
       @time -= @rate
 
-    Emitter.draw_list\update dt, @world
-
+    @amount > 0
 
 module "particles", package.seeall
 
 class Spark extends Particle
   color: { 255, 211, 118 } -- the spark?
-
-
 

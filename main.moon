@@ -50,10 +50,11 @@ class World
   draw: =>
     @bg\draw!
     @enemies\draw!
-
     Emitter\draw_all!
 
   update: (dt) =>
+    Emitter\update_all dt, self
+
     @spawner\update dt
     @enemies\update dt
     @bg\update dt
@@ -69,7 +70,7 @@ love.load = ->
   w = World viewport
   p = Player w, 50, 100
 
-  emitter = Emitter w, 10, 40
+  -- Emitter\add Emitter, w, 10, 40
 
   font_image = imgfy"img/font.png"
 
@@ -98,7 +99,6 @@ love.load = ->
     viewport\update dt
     p\update dt
     w\update dt
-    emitter\update dt
 
   love.draw = ->
     viewport\apply!
@@ -107,6 +107,10 @@ love.load = ->
     p\draw!
 
     g.print tostring(timer.getFPS!), 2, 2
+
+    if Emitter.emitter_list
+      g.print tostring(#Emitter.emitter_list), 2, 12
+
     viewport\pop!
 
     snapper\tick! if snapper
