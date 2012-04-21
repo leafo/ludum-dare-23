@@ -1,5 +1,5 @@
 
-import timer, keyboard from love
+import graphics, timer, keyboard from love
 
 export *
 
@@ -41,16 +41,18 @@ class Player extends Entity
     @sprite = Spriter imgfy"img/sprite.png", 16, 20
     @last_shot = 0
     @bullets = BulletList!
+    @effects = EffectList!
 
     @cur_point = 1
 
     @movement_lock = 0
 
   draw: =>
-    @sprite\draw_cell 0, @box.x - @ox, @box.y - @oy
-    @bullets\draw!
+    @effects\apply ->
+      @sprite\draw_cell 0, @box.x - @ox, @box.y - @oy
 
-    @box\outline!
+    @bullets\draw!
+    -- @box\outline!
 
   shoot: =>
     pt = @shoot_points[@cur_point]
@@ -61,6 +63,7 @@ class Player extends Entity
 
   update: (dt) =>
     @bullets\update dt
+    @effects\update dt
 
     @movement_lock = math.max 0, @movement_lock - dt
 
@@ -79,6 +82,7 @@ class Player extends Entity
     cx, cy = @fit_move unpack @velocity * dt
     if cx
       @movement_lock = 0.1
+      @effects\add effects.Flash 0.2
       @velocity[1] = -@velocity[1]
 
     -- see if we are shooting

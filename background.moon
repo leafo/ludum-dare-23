@@ -69,5 +69,5 @@ class Background
 
     g.setPixelEffect!
 
-    @box\outline!
+    -- @box\outline!
 

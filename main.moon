@@ -11,6 +11,8 @@ import timer, keyboard from love
 require "guns"
 require "player"
 require "background"
+require "effects"
+
 require "lovekit.screen_snap"
 
 class World
@@ -57,6 +59,8 @@ love.load = ->
 
     w\draw!
     p\draw!
+
+    g.print tostring(timer.getFPS!), 2, 2
 
     viewport\pop!
 
