@@ -66,7 +66,7 @@ class World
   collides: (thing) =>
     @bg\collides thing
 
-class Game
+export class Game
   new: =>
     @viewport = EffectViewport scale: 4
 
@@ -95,7 +95,8 @@ class Game
 snapper = nil
 
 love.load = ->
-  export game = Game!
+  export dispatch = Dispatch TitleScreen!
+  -- export game = Game!
 
   font_image = imgfy"img/font.png"
 
@@ -103,14 +104,17 @@ love.load = ->
   g.setFont font
 
   love.mousepressed = (x,y, button) ->
-    x, y = game.viewport\unproject x, y
-    -- emitters.PourSmoke\add w, x, y
+    if game
+      x, y = game.viewport\unproject x, y
+      -- emitters.PourSmoke\add w, x, y
 
   love.keypressed = (key, code) ->
+    return if dispatch\send_key key, code
+
     switch key
       when "escape" then os.exit!
       when "d"
-        game.player\die!
+        game.player\die! if game
       when "x" -- cool
         if snapper
           slow_mode = false
@@ -125,9 +129,9 @@ love.load = ->
   love.update = (dt) ->
     reloader\update!
     dt /= 3 if slow_mode
-    game\update dt
+    dispatch\update dt
 
   love.draw = ->
     snapper\tick! if snapper
-    game\draw!
+    dispatch\draw!
 
