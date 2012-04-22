@@ -138,5 +138,5 @@ class Beta extends Gun
         @time -= @charge_time
         @fire!
     else
-      @time = dampen @time, @charge_time*2, dt
+      @time = dampen @time, @charge_time, dt
 

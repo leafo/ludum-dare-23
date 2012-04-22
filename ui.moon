@@ -48,11 +48,12 @@ class Dispatch
 
     insert @stack, state
 
-  pop: =>
+  pop: (n=1) =>
     @blend_effect = nil
-
-    os.exit! if #stack == 0
-    remove @stack
+    while n > 0
+      os.exit! if #@stack == 0
+      remove @stack
+      n -= 1
 
   draw: =>
     if @blend_effect
@@ -86,21 +87,25 @@ class TitleScreen
     @img\draw 0, 0
 
 class GameOver
-  high_scores: {
-    1000, 10000, 50000, 100000, 250000, 500000, 1000000
-  }
+  watch_class self
 
-  new: =>
-    @sort_scores!
+  new: (@score, @time) =>
+    @viewport = Viewport scale: 4
+    @img = imgfy"img/gameover.png"
+    @time = math.floor @time
 
-  sort_scores: =>
-    table.sort @high_scores
+  on_key: (key) =>
+    next_keys = { k, true for k in *{"return", "x", "c", "escape"} }
 
-  add_score: (score) =>
-    table.insert @high_scores, scores
-    @sort_scores!
+    if next_keys[key]
+      dispatch\pop 2
 
-  draw_high_scores: =>
+  draw: =>
+    @viewport\apply!
+    @img\draw 0, 0
+
+    g.print tostring(@score), 45, 43
+    g.print tostring(@time), 45, 56
 
 class Pause
   nil
@@ -158,7 +163,6 @@ class Hud
     @health_bar.value = @player.health / @player.max_health
 
     beta_gun = @player.guns.beta
-    @charge_bar.value = smoothstep 0, 1, beta_gun.time / beta_gun.charge_time
-
+    @charge_bar.value = math.sqrt beta_gun.time / beta_gun.charge_time
 
 

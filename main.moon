@@ -77,11 +77,16 @@ class World
 
 export class Game
   new: =>
+    @start_time = timer.getTime!
     @viewport = EffectViewport scale: 4
 
     @world = World @viewport
     @player = Player @world, 50, 100
     @hud = Hud @viewport, @player
+
+  goto_gameover: =>
+    game_over = GameOver @hud.score, timer.getTime! - @start_time
+    dispatch\push_with_effect game_over, 2.0, fade_effect
 
   update: (dt) =>
     @viewport\update dt
@@ -89,6 +94,9 @@ export class Game
     @world\update dt
 
     @hud\update dt
+
+    if @player.health <= 0 and #@player.effects == 0
+      @goto_gameover!
 
   draw: =>
     @viewport\apply!
@@ -115,7 +123,8 @@ love.load = ->
   love.mousepressed = (x,y, button) ->
     if game
       x, y = game.viewport\unproject x, y
-      game.world.bg\feed_energy 3
+      game.player\die!
+      -- game.world.bg\feed_energy 3
       -- game.world.enemy_bullets\add EnemyBullet, x, y, 0, 30
       -- game.world.powerups\add HealthPowerup, x, y
       -- emitters.PourSmoke\add w, x, y

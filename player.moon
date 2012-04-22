@@ -181,7 +181,6 @@ class Player extends Entity
       @velocity[1] = -@velocity[1]
 
 
-
     if @movement_lock == 0 and @health > 0
       -- see if we are shooting
       @guns.beta\update dt, keyboard.isDown @controls.shoot_two
