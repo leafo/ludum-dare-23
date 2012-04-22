@@ -163,9 +163,19 @@ class Smoke extends ImageParticle
     base.drawable = (x, y) =>
       base.sprite\draw_cell 1, x, y
 
-
 class Explosion extends ImageParticle
-  nil
+  life: 0.8
+
+  fade_in_time: nil
+  fade_out_time: nil
+
+  make_drawable: (base) ->
+    base.sprite = with Spriter imgfy"img/sprite.png", 16, 20
+      .oy = 20 * 2
+
+    anim = Animator base.sprite, { 1, 2, 3, 4, 5 }
+    base.drawable = (x, y) =>
+      anim\drawt @p!, x, y
 
 module "emitters", package.seeall
 
@@ -189,4 +199,9 @@ class PourSmoke extends Emitter
   fan: math.pi
 
   vel: 10
+
+class Explosion extends Emitter
+  default_particle: particles.Explosion
+  per_frame: 1
+  amount: 1
 

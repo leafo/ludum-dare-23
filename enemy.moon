@@ -72,6 +72,7 @@ class Enemy extends Entity
       @effects\add effects.Death 1.0
 
       cx, cy = @box\center!
+      emitters.Explosion\add w, cx, cy
       @death_emitter = with emitters.PourSmoke\add w, cx, cy
         .attach = self
     else
