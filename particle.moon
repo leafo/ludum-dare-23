@@ -17,7 +17,10 @@ class Particle
   tv: 800
 
   new: (@x,@y, @vx=0, @vy=0, @ax=0, @ay=0) =>
+    -- MUST reset all properties that may have been set by any particle
+    -- due to object reuse
     @time = 0
+    @life = nil
 
   p: => @time / @life
 
@@ -112,6 +115,7 @@ class Emitter
     if not Emitter.draw_list
       Emitter.draw_list = ReuseList!
 
+    @attach = nil -- attached to some object?
     @amount = @@amount
     @time = @rate
 
@@ -147,8 +151,9 @@ class Spark extends Particle
       @life = math.random! / 2 + 0.05
 
 class Smoke extends ImageParticle
-  life: 2
-  fade_in_time: 0.4
+  life: 0.8
+  fade_in_time: 0.1
+  fade_out_time: 0.2
 
   -- so ugly
   make_drawable: (base) ->
@@ -180,6 +185,8 @@ class PourSmoke extends Emitter
   rate: 0.05
   per_frame: 2
   amount: 10
+
+  fan: math.pi
 
   vel: 10
 

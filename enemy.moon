@@ -54,6 +54,12 @@ class Enemy extends Entity
     if @health < 0 and #@effects == 0
       return false
 
+    -- make it follow!
+    if @death_emitter and @death_emitter.attach == self
+      cx, cy = @box\center!
+      @death_emitter.x = cx
+      @death_emitter.y = cy
+
     -- are they in the world?
     @box\above_of v or v\touches_box @box
 
@@ -64,6 +70,10 @@ class Enemy extends Entity
     if @health < 0
       @velocity[2] /= 2
       @effects\add effects.Death 1.0
+
+      cx, cy = @box\center!
+      @death_emitter = with emitters.PourSmoke\add w, cx, cy
+        .attach = self
     else
       @effects\add effects.Flash 0.1
 
