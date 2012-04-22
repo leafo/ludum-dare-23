@@ -20,6 +20,7 @@ require "player"
 require "background"
 require "effects"
 require "enemy"
+require "ui"
 
 require "lovekit.screen_snap"
 
@@ -44,7 +45,6 @@ class EffectViewport extends Viewport
     s = @screen.scale
     g.scale 1/s, 1/s
 
-
 class World
   new: (@viewport) =>
     @bg = Background @viewport
@@ -66,13 +66,41 @@ class World
   collides: (thing) =>
     @bg\collides thing
 
+class Game
+  new: =>
+    @viewport = EffectViewport scale: 4
+
+    @world = World @viewport
+    @player = Player @world, 50, 100
+    @hud = Hud @viewport, @player
+
+  update: (dt) =>
+    @viewport\update dt
+    @player\update dt
+    @world\update dt
+
+    @hud\update dt
+
+  draw: =>
+    @viewport\apply!
+
+    @world\draw!
+    @player\draw!
+
+    -- g.print tostring(timer.getFPS!), 2, 2
+
+    -- if Emitter.emitter_list
+    --   g.print tostring(#Emitter.emitter_list), 2, 12
+    --   g.print tostring(#Emitter.draw_list), 2, 22
+
+    @hud\draw!
+
+    @viewport\pop!
+
 snapper = nil
 
 love.load = ->
-  viewport = EffectViewport scale: 4
-
-  w = World viewport
-  p = Player w, 50, 100
+  export game = Game!
 
   font_image = imgfy"img/font.png"
 
@@ -80,7 +108,7 @@ love.load = ->
   g.setFont font
 
   love.mousepressed = (x,y, button) ->
-    -- x, y = viewport\unproject x, y
+    x, y = viewport\unproject x, y
     -- emitters.PourSmoke\add w, x, y
 
   love.keypressed = (key, code) ->
@@ -98,27 +126,11 @@ love.load = ->
         print "slow mode:", slow_mode
 
   love.update = (dt) ->
-    dt /= 3 if slow_mode
-
     reloader\update!
-
-    viewport\update dt
-    p\update dt
-    w\update dt
+    dt /= 3 if slow_mode
+    game\update dt
 
   love.draw = ->
-    viewport\apply!
-
-    w\draw!
-    p\draw!
-
-    g.print tostring(timer.getFPS!), 2, 2
-
-    if Emitter.emitter_list
-      g.print tostring(#Emitter.emitter_list), 2, 12
-      g.print tostring(#Emitter.draw_list), 2, 22
-
-    viewport\pop!
-
     snapper\tick! if snapper
+    game\draw!
 

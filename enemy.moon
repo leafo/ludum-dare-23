@@ -186,6 +186,9 @@ class Enemy extends Entity
       emitters.Explosion\add w, cx, cy
       @death_emitter = with emitters.PourSmoke\add w, cx, cy
         .attach = self
+
+      -- boost score!
+      game.hud.score += 44
     else
       @effects\add effects.Flash 0.1
 
