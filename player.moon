@@ -33,7 +33,8 @@ class Player extends Entity
   fire_rate: 0.3
 
   shoot_points: {
-    {0,-2}, {9, -2}
+    -- {0,-2}, {9, -2}
+    {4, 0}
   }
 
   new: (...) =>
@@ -57,7 +58,11 @@ class Player extends Entity
 
   shoot: =>
     pt = @shoot_points[@cur_point]
-    @bullets\add Bullet, @box.x + pt[1], @box.y + pt[2]
+
+    x, y = @box.x + pt[1], @box.y + pt[2]
+    emitters.ShootBlue\add @world, x, y
+
+    @bullets\add Bullet, x, y
 
     @cur_point += 1
     @cur_point = 1  if @cur_point > #@shoot_points

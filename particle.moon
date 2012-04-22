@@ -97,7 +97,7 @@ class Emitter
 
   ----
 
-  per_frame: 2
+  per_frame: 1
   rate: 0.1
   dir: 0
   fan: math.pi/5
@@ -124,7 +124,7 @@ class Emitter
     dir = @dir + (math.random! - 0.5) * @fan
     dx, dy = math.cos(dir), math.sin(dir)
 
-    Emitter.draw_list\add @particle_cls, @x, @y, dx*@vel, dy*@vel, dx*@ay, dy*@ax
+    Emitter.draw_list\add @particle_cls, @x, @y, dx*@vel, dy*@vel, dx*@ax, dy*@ay
 
     @amount -= 1
 
@@ -154,14 +154,19 @@ class Smoke extends ImageParticle
   life: 0.8
   fade_in_time: 0.1
   fade_out_time: 0.2
+  cell_id: 1
 
   -- so ugly
   make_drawable: (base) ->
-    base.sprite = with Spriter imgfy"img/sprite.png", 20, 16
+    base.sprite = with Spriter imgfy"img/sprite.png", 16, 20
       .oy = 20 * 3
 
     base.drawable = (x, y) =>
-      base.sprite\draw_cell 1, x, y
+      base.sprite\draw_cell base.cell_id, x, y
+
+class BlueGlow extends Smoke
+  life: 0.2
+  cell_id: 2
 
 class Explosion extends ImageParticle
   life: 0.8
@@ -200,8 +205,14 @@ class PourSmoke extends Emitter
 
   vel: 10
 
+class ShootBlue extends Emitter
+  default_particle: particles.BlueGlow
+  vel: 20
+  dir: math.pi*1.5
+  fan: 0
+  amount: 1
+
 class Explosion extends Emitter
   default_particle: particles.Explosion
-  per_frame: 1
   amount: 1
 
