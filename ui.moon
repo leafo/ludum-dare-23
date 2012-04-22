@@ -107,21 +107,28 @@ class Pause
 
 class HorizBar
   color: { 255, 128, 128, 128 }
+  border: true
   padding: 1
 
   new: (@w, @h, @value=0.5)=>
 
   draw: (x, y) =>
     g.push!
-    g.setLineWidth 0.6
-    g.rectangle "line", x, y, @w, @h
 
-    g.setColor @color
-    w = @value * (@w - @padding*2)
+    if @border
+      g.setLineWidth 0.6
+      g.rectangle "line", x, y, @w, @h
 
-    g.rectangle "fill", x + @padding, y + @padding, w, @h - @padding*2
+      g.setColor @color
+      w = @value * (@w - @padding*2)
+
+      g.rectangle "fill", x + @padding, y + @padding, w, @h - @padding*2
+    else
+      g.setColor @color
+      w = @value * @w
+      g.rectangle "fill", x, y, w, @h
+
     g.pop!
-
     g.setColor 255,255,255,255
 
 class Hud
@@ -131,10 +138,17 @@ class Hud
 
   new: (@viewport, @player) =>
     @health_bar = HorizBar 50, 6
+    @charge_bar = with HorizBar 96, 1
+      .value = 0.0
+      .color = { 226, 44, 240, 128 }
+      .border = false
+      .padding = 0
 
   draw: =>
     @health_bar\draw 2, 2
     g.print tostring(math.floor(@display_score)), 54, 1
+
+    @charge_bar\draw 2, @viewport.h - 2 - @charge_bar.h
 
   update: (dt) =>
     if @display_score < @score
@@ -142,4 +156,9 @@ class Hud
       @display_score = math.min @display_score, @score
 
     @health_bar.value = @player.health / @player.max_health
+
+    beta_gun = @player.guns.beta
+    @charge_bar.value = smoothstep 0, 1, beta_gun.time / beta_gun.charge_time
+
+
 

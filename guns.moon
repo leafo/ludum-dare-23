@@ -118,6 +118,25 @@ class Alpha extends Gun
   upgrade: =>
     @curr_level = math.min @curr_level + 1, #@levels
 
+  shoot: =>
+    @player.guns.beta.time = 0
+    super!
+
 class Beta extends Gun
+  charge_time: 0.5
+
   bullet_type: AbsorbBullet
+
+  new: (...) =>
+    super ...
+    @time = 0
+
+  update: (dt, @is_charging) =>
+    if @is_charging
+      @time += dt
+      if @time >= @charge_time
+        @time -= @charge_time
+        @fire!
+    else
+      @time = dampen @time, @charge_time*2, dt
 
