@@ -81,6 +81,7 @@ class Player extends Entity
     -- @box\outline!
 
   take_hit: (damage) =>
+    return if true
     return if @health <= 0 -- already dead
 
     @health = math.max 0, @health - damage

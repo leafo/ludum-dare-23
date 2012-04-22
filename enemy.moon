@@ -136,7 +136,7 @@ class EnemyWave extends Sequence
         for i=1,4
           e = spawn etype, pos, straight spd
           wait 0.4
-        e\attach_powerup HealthPowerup
+        e\attach_powerup shuffle_powerup!
         e
 
       send_row -0.3
@@ -151,7 +151,8 @@ class EnemyWave extends Sequence
       wait 1.0
 
       wait_enemies {
-        spawn enemies.Red2, 0, straight 50
+        with spawn enemies.Red2, 0, straight 50
+          \attach_powerup GunPowerup
       }
 
       -- white two fans
@@ -166,8 +167,6 @@ class EnemyWave extends Sequence
           with spawn enemies.White2, b, straight 50
             \attach_powerup shuffle_powerup!
         }
-
-
 
       send_row -0.3, White
       wait 1.0

@@ -47,7 +47,9 @@ class HealthPowerup extends Powerup
 class GunPowerup extends Powerup
   anim: { 0, 1 }
   on_pickup: (player) =>
-    player.gun.alpha\upgrade!
+    super player
+    for _, gun in pairs player.guns
+      gun\upgrade!
 
 shuffle_powerup = ->
   r = math.random!

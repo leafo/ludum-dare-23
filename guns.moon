@@ -78,16 +78,8 @@ class Gun
 
   shoot_points: { {1, -4} }
 
-  levels: {
-    {}
-    {
-      rate: 0.3
-      shoot_points: {{-2, -3}, {6, -3}} -- wings
-    }
-  }
-
   prop: (name) =>
-    @levels[@curr_level][name] or self[name]
+    @levels and @levels[@curr_level][name] or self[name]
 
   new: (@player) =>
     @last_shot = 0
@@ -113,9 +105,16 @@ class Gun
 module "guns", package.seeall
 
 class Alpha extends Gun
-  is_max: => @curr_level == #@levels
+  levels: {
+    {}
+    {
+      rate: 0.3
+      shoot_points: {{-2, -3}, {6, -3}} -- wings
+    }
+  }
 
   upgrade: =>
+    print "upgrade alpha"
     @curr_level = math.min @curr_level + 1, #@levels
 
   shoot: =>
@@ -130,6 +129,9 @@ class Beta extends Gun
   new: (...) =>
     super ...
     @time = 0
+
+  upgrade: =>
+    print "upgrade beta"
 
   update: (dt, @is_charging) =>
     if @is_charging
