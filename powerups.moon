@@ -49,7 +49,7 @@ class GunPowerup extends Powerup
   on_pickup: (player) =>
     player.gun.alpha\upgrade!
 
-shuffle_partile = ->
+shuffle_powerup = ->
   r = math.random!
   if r < 0.1
     GunPowerup

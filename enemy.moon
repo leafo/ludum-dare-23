@@ -3,11 +3,26 @@ import graphics, timer, keyboard from love
 
 export *
 
+rr = (min, max) -> math.random! * (max - min) + min
+
 class ShootPattern extends Sequence
   new: (@enemy, fn) =>
     world = @enemy.world
 
+    -- this is a mess
+    scope = nil
     scope = setmetatable {
+      enemy: @enemy,
+      player: game.player
+
+      fan_bullets: (deg1, deg2, rate, amount) ->
+        if deg1 < deg2
+          dd = (deg2 - deg1) / amount
+          while deg1 < deg2
+            scope.fire deg1
+            deg1 += dd
+            scope.wait rate if rate and rate > 0
+
       fire: (deg, speed=40) ->
         deg += 90 -- default to down
         vx, vy = unpack (speed * Vec2d.from_angle deg) + @enemy.velocity
@@ -115,10 +130,6 @@ class EnemyWave extends Sequence
     wave = ->
       wait 1
 
-      wait_enemies {
-        spawn enemies.Red2, 0, straight 50
-      }
-
       send_row = (pos, etype=Red) ->
         e = nil
         spd = math.random 50, 60
@@ -138,6 +149,25 @@ class EnemyWave extends Sequence
       }
 
       wait 1.0
+
+      wait_enemies {
+        spawn enemies.Red2, 0, straight 50
+      }
+
+      -- white two fans
+      for i=1,3
+        a,b = -0.4, 0.4
+        a,b = b,a if math.random! >= 0.5
+
+        spawn enemies.White2, a, straight 50
+
+        wait rr 0.5,1.5
+        wait_enemies {
+          with spawn enemies.White2, b, straight 50
+            \attach_powerup shuffle_powerup!
+        }
+
+
 
       send_row -0.3, White
       wait 1.0
@@ -275,4 +305,10 @@ class Red2 extends Red
     fire 30
     wait 1.0
     again!
+
+
+class White2 extends White
+  shoot_template: ->
+    wait 0.5
+    fan_bullets -60, 60, nil, 4
 
