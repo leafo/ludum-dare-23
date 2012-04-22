@@ -8,7 +8,11 @@ slow_mode = false
 g = love.graphics
 import timer, keyboard from love
 
-export n = (thing) -> thing.__name or thing.__class.__name
+export n = (thing) ->
+  if type(thing) == "table"
+    thing.__name or (thing.__class and thing.__class.__name) or tostring thing
+  else
+    tostring thing
 
 require "guns"
 require "player"
@@ -70,12 +74,14 @@ love.load = ->
   w = World viewport
   p = Player w, 50, 100
 
-  -- Emitter\add Emitter, w, 10, 40
-
   font_image = imgfy"img/font.png"
 
   font = g.newImageFont font_image.tex, " 1234567890"
   g.setFont font
+
+  love.mousepressed = (x,y, button) ->
+    x, y = viewport\unproject x, y
+    emitters.PourSmoke\add w, x, y
 
   love.keypressed = (key, code) ->
     switch key

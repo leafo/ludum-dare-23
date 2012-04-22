@@ -10,6 +10,9 @@ class Particle
   life: 1
   color: { 255, 255, 255 }
 
+  fade_in_time: nil -- when to end fade in, or nil to disable
+  fade_out_time: 0.4 -- when to start fade out
+
   -- terminal velocity
   tv: 800
 
@@ -33,15 +36,41 @@ class Particle
     return false unless world.viewport\touches_pt @x,@y
     @time < @life
 
-  draw: =>
-    half = @size / 2
-
+  set_color: =>
     t = @p!
     a = if t > 0.5 then (1-t)*2*255 else 255
-    r,g,b = unpack @color
 
+    a = if @fade_out_time and t >= @fade_out_time
+      (1 - t) / (1 - @fade_out_time) * 255
+    elseif @fade_in_time and t < @fade_in_time
+      t / @fade_in_time * 255
+    else
+      255
+
+    r,g,b = unpack @color
     graphics.setColor r,g,b,a
+
+  draw: =>
+    half = @size / 2
+    @set_color!
     graphics.rectangle "fill", @x - half, @y - half, @size, @size
+
+class ImageParticle extends Particle
+  sprite: nil -- set by make_drawable
+  drawable: nil
+
+  new: (...) =>
+    self.make_drawable @@__base unless @drawable
+    super ...
+
+  draw: =>
+    @set_color!
+
+    half_x = @sprite.cell_w / 2
+    half_y = @sprite.cell_h / 2
+
+    @drawable @x - half_x, @y - half_y
+
 
 class Emitter
   self.draw_list = nil
@@ -70,7 +99,9 @@ class Emitter
   dir: 0
   fan: math.pi/5
 
-  accel: 200
+  ax: 0
+  ay: 0
+
   vel: 0
 
   amount: 15 -- how many particles to spawn before death
@@ -89,7 +120,7 @@ class Emitter
     dir = @dir + (math.random! - 0.5) * @fan
     dx, dy = math.cos(dir), math.sin(dir)
 
-    Emitter.draw_list\add @particle_cls, @x, @y, dx*@vel, dy*@vel, dx, dy*@accel
+    Emitter.draw_list\add @particle_cls, @x, @y, dx*@vel, dy*@vel, dx*@ay, dy*@ax
 
     @amount -= 1
 
@@ -115,9 +146,21 @@ class Spark extends Particle
     else
       @life = math.random! / 2 + 0.05
 
-class Smoke extends Particle
-  size: 3
-  color: { 111, 111, 111 }
+class Smoke extends ImageParticle
+  life: 2
+  fade_in_time: 0.4
+
+  -- so ugly
+  make_drawable: (base) ->
+    base.sprite = with Spriter imgfy"img/sprite.png", 20, 16
+      .oy = 20 * 3
+
+    base.drawable = (x, y) =>
+      base.sprite\draw_cell 1, x, y
+
+
+class Explosion extends ImageParticle
+  nil
 
 module "emitters", package.seeall
 
@@ -127,8 +170,16 @@ class HitEnemy extends Emitter
   per_frame: 4
   rate: 0.05
   amount: 8
-  accel: -200
+  ay: -200
   vel: 100
 
   dir: math.pi*1.5
+
+class PourSmoke extends Emitter
+  default_particle: particles.Smoke
+  rate: 0.05
+  per_frame: 2
+  amount: 10
+
+  vel: 10
 
