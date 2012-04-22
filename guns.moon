@@ -67,16 +67,16 @@ class EnemyBullet extends AnimBullet
 
 class Gun
   bullet_type: SimpleBullet
-  curr_level: 1
+  curr_level: 2
   rate: 0.5
 
-  shoot_points: { {4, 0} }
+  shoot_points: { {1, -4} }
 
   levels: {
     {}
     {
       rate: 0.3
-      shoot_points: {{0,-2}, {9, -2}} -- wings
+      shoot_points: {{-2, -3}, {6, -3}} -- wings
     }
   }
 
