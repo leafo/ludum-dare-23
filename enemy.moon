@@ -162,7 +162,7 @@ class Enemy extends Entity
     @box\move unpack @velocity * dt
     v = @world.viewport
 
-    if @health < 0 and #@effects == 0
+    if @health <= 0 and #@effects == 0
       return false
 
     -- make it follow!
@@ -174,20 +174,22 @@ class Enemy extends Entity
     -- are they in the world?
     @box\above_of v or v\touches_box @box
 
+  die: =>
+    @health = 0 if @health > 0
+    @velocity[2] /= 2
+    @effects\add effects.Death 1.0
+
+    cx, cy = @box\center!
+    emitters.Explosion\add w, cx, cy
+    @death_emitter = with emitters.PourSmoke\add @world, cx, cy
+      .attach = self
+
   take_hit: (bullet) =>
     emitters.HitEnemy\add @world, bullet.x, bullet.y
 
     @health -= bullet.damage
-    if @health < 0
-      @velocity[2] /= 2
-      @effects\add effects.Death 1.0
-
-      cx, cy = @box\center!
-      emitters.Explosion\add w, cx, cy
-      @death_emitter = with emitters.PourSmoke\add w, cx, cy
-        .attach = self
-
-      -- boost score!
+    if @health <= 0
+      @die!
       game.hud.score += 44
     else
       @effects\add effects.Flash 0.1

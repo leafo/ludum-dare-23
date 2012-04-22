@@ -87,14 +87,9 @@ class Game
     @world\draw!
     @player\draw!
 
-    -- g.print tostring(timer.getFPS!), 2, 2
-
-    -- if Emitter.emitter_list
-    --   g.print tostring(#Emitter.emitter_list), 2, 12
-    --   g.print tostring(#Emitter.draw_list), 2, 22
+    g.print tostring(timer.getFPS!), 2, 12
 
     @hud\draw!
-
     @viewport\pop!
 
 snapper = nil
@@ -108,12 +103,14 @@ love.load = ->
   g.setFont font
 
   love.mousepressed = (x,y, button) ->
-    x, y = viewport\unproject x, y
+    x, y = game.viewport\unproject x, y
     -- emitters.PourSmoke\add w, x, y
 
   love.keypressed = (key, code) ->
     switch key
       when "escape" then os.exit!
+      when "d"
+        game.player\die!
       when "x" -- cool
         if snapper
           slow_mode = false

@@ -13,6 +13,21 @@ dampen = (val, speed, dt) ->
   else
     val
 
+-- love it!
+join = (objs) ->
+  {
+    all: (fn) ->
+      yes = true
+      for o in *objs
+        yes = fn o
+        break if not yes
+      yes
+
+    set: (key, value) ->
+      for o in *objs
+        o[key] = value
+  }
+
 class Player extends Entity
   watch_class self
 
@@ -38,6 +53,7 @@ class Player extends Entity
   }
 
   cell_id: 0
+  max_health: 100
 
   new: (...) =>
     super ...
@@ -49,9 +65,12 @@ class Player extends Entity
     @cur_point = 1
 
     @movement_lock = 0
+    @health = @max_health
 
   draw: =>
     @bullets\draw!
+
+    return if @health <= 0 and #@effects == 0
 
     @effects\apply ->
       @sprite\draw_cell @cell_id, @box.x - @ox, @box.y - @oy
@@ -69,21 +88,69 @@ class Player extends Entity
     @cur_point += 1
     @cur_point = 1  if @cur_point > #@shoot_points
 
+  take_hit: (damage) =>
+    return if @health <= 0 -- already dead
+
+    @health = math.max 0, @health - damage
+
+    if @health <= 0
+      @die!
+      -- goto gameover
+    else
+      @movement_lock = 0.1
+      @effects\add effects.Flash 0.2
+      @world.viewport\shake!
+
+  die: =>
+    @health = 0 if @health > 0
+
+    @movement_lock = nil -- STOP!!
+    @effects\add effects.Death 1.0
+
+    cx, cy = @box\center!
+
+    @death_emitters = join {
+      emitters.PourSmoke\add @world, cx, cy
+      emitters.RadialSpark\add @world, cx, cy
+      emitters.BigExplosion\add @world, cx, cy
+    }
+
+    @death_emitters.set "attach", self
+
   update: (dt) =>
     @bullets\update dt, @world
-
-    -- see if enemies are hit
-    for e in *@world.enemies
-      if e.alive
-        for b in *@bullets
-          if b.alive and e.health > 0 and b\touches_box e.box
-            e\take_hit b
-            b.alive = false
-
     @effects\update dt
 
+
+    if @death_emitters
+      cx, cy = @box\center!
+      running = @death_emitters.all (e) ->
+        if e.attach == self
+          e.x = cx
+          e.y = cy
+          true
+      @death_emitters = nil if not running
+
+    -- collide
+    if @health > 0
+      for e in *@world.enemies
+        if e.alive and e.health > 0
+
+          -- see if a bullet is hitting enemy
+          for b in *@bullets
+            if b.alive and b\touches_box e.box
+              e\take_hit b
+              b.alive = false
+
+          -- see if we are hitting enemy
+          if @movement_lock == 0 and @box\touches_box e.box
+            @take_hit 80
+            @velocity = e.box\vector_to(@box)\normalized! * 100
+            e\die!
+
     -- movement
-    @movement_lock = math.max 0, @movement_lock - dt
+    if @movement_lock != nil
+      @movement_lock = math.max 0, @movement_lock - dt
 
     if @movement_lock == 0
       move = movement_vector(@speed) * dt * @accel
@@ -106,15 +173,14 @@ class Player extends Entity
 
     cx, cy = @fit_move unpack @velocity * dt
     if cx -- hit a wall
-      @movement_lock = 0.1
-      @effects\add effects.Flash 0.2
-      @world.viewport\shake!
+      @take_hit 5
       @velocity[1] = -@velocity[1]
 
-    -- see if we are shooting
-    if keyboard.isDown @controls.shoot
-      t = timer.getTime!
-      if t - @last_shot > @fire_rate
-        @shoot!
-        @last_shot = t
+    if @movement_lock == 0
+      -- see if we are shooting
+      if keyboard.isDown @controls.shoot
+        t = timer.getTime!
+        if t - @last_shot > @fire_rate
+          @shoot!
+          @last_shot = t
 

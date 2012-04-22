@@ -217,3 +217,20 @@ class Explosion extends Emitter
   default_particle: particles.Explosion
   amount: 1
 
+class BigExplosion extends Emitter
+  default_particle: particles.Explosion
+  amount: 4
+
+  spawn: (...) =>
+    @x += math.random -2,2
+    @y += math.random -2,2
+    super ...
+
+class RadialSpark extends Emitter
+  default_particle: particles.Spark
+  amount: 20
+  rate: 0.03
+  vel: 100
+  ay: 500
+  fan: 2*math.pi
+
