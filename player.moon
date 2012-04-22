@@ -37,6 +37,8 @@ class Player extends Entity
     {4, 0}
   }
 
+  cell_id: 0
+
   new: (...) =>
     super ...
     @sprite = Spriter imgfy"img/sprite.png", 16, 20
@@ -52,7 +54,7 @@ class Player extends Entity
     @bullets\draw!
 
     @effects\apply ->
-      @sprite\draw_cell 0, @box.x - @ox, @box.y - @oy
+      @sprite\draw_cell @cell_id, @box.x - @ox, @box.y - @oy
 
     -- @box\outline!
 
@@ -86,6 +88,13 @@ class Player extends Entity
     if @movement_lock == 0
       move = movement_vector(@speed) * dt * @accel
       @velocity += move
+
+      if move[1] < 0
+        @cell_id = 1
+      elseif move[1] > 0
+        @cell_id = 2
+      else
+        @cell_id = 0
 
       @velocity\truncate @speed
 
