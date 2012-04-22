@@ -81,22 +81,22 @@ class EnemyWave extends Sequence
 
     swoop_right = swoop @world, 20,
       Vec2d(0.3, 0.0),
-      Vec2d(1.0, 0.8),
+      Vec2d(0.8, 0.8),
       Vec2d(0.0, 3.0)
 
     swoop_left = swoop @world, 20,
       Vec2d(-0.3, 0.0),
-      Vec2d(-1.0, 0.8),
+      Vec2d(-0.8, 0.8),
       Vec2d(-0.0, 3.0)
 
     wave = ->
-      -- send_row = (pos) ->
-      --   e = nil
-      --   spd = math.random 50, 60
-      --   for i=1,4
-      --     e = spawn Red, pos, straight spd
-      --     wait 0.4
-      --   e
+      send_row = (pos) ->
+        e = nil
+        spd = math.random 50, 60
+        for i=1,4
+          e = spawn White, pos, straight spd
+          wait 0.4
+        e
 
       -- send_row -0.5
       -- wait 1.0
@@ -106,6 +106,11 @@ class EnemyWave extends Sequence
         spawn Pink, 0.3, swoop_right
         spawn Pink, -0.3, swoop_left
       }
+      wait 1.0
+
+      send_row -0.3
+      wait 1.0
+      send_row 0.3
 
       again!
 
