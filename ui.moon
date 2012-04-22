@@ -7,7 +7,7 @@ export *
 
 -- ugh
 fade_effect = (prev, current, t) ->
-  t = smoothstep 0, 1, t
+  -- t = smoothstep 0, 1, t
 
   if t < 0.5
     prev\draw!
@@ -78,7 +78,8 @@ class TitleScreen
       when "return" then @start_game!
 
   start_game: =>
-    dispatch\push_with_effect Game!, 1, fade_effect
+    export game = Game! -- :)
+    dispatch\push_with_effect game, 0.3, fade_effect
 
   draw: =>
     @viewport\apply!

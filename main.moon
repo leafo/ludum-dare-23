@@ -19,6 +19,7 @@ require "guns"
 require "player"
 require "background"
 require "effects"
+require "powerups"
 require "enemy"
 require "ui"
 
@@ -50,10 +51,12 @@ class World
     @bg = Background @viewport
     @enemies = ReuseList!
     @spawner = EnemyWave self, @enemies
+    @powerups = ReuseList!
 
   draw: =>
     @bg\draw!
     @enemies\draw!
+    @powerups\draw!
     Emitter\draw_all!
 
   update: (dt) =>
@@ -61,6 +64,7 @@ class World
 
     @spawner\update dt
     @enemies\update dt
+    @powerups\update dt
     @bg\update dt
 
   collides: (thing) =>
@@ -106,6 +110,7 @@ love.load = ->
   love.mousepressed = (x,y, button) ->
     if game
       x, y = game.viewport\unproject x, y
+      game.world.powerups\add HealthPowerup, x, y
       -- emitters.PourSmoke\add w, x, y
 
   love.keypressed = (key, code) ->
@@ -115,7 +120,7 @@ love.load = ->
       when "escape" then os.exit!
       when "d"
         game.player\die! if game
-      when "x" -- cool
+      when "XX" -- cool
         if snapper
           slow_mode = false
           snapper = nil

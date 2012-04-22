@@ -142,14 +142,18 @@ module "particles", package.seeall
 
 class Spark extends Particle
   color: { 255, 211, 118 } -- the spark?
-  life: 0.4
+  life: 1.0
 
   new: (...) =>
     super ...
     if 1 == math.random 8
-      @life = math.random! * 3 + 2
+      @life = @life * (math.random! * 3 + 2)
     else
-      @life = math.random! / 2 + 0.05
+      @life = @life * (math.random! / 2 + 0.05)
+
+
+class BlueSpark extends Spark
+  color: { 99, 242, 255 }
 
 class Smoke extends ImageParticle
   life: 0.8
@@ -233,4 +237,11 @@ class RadialSpark extends Emitter
   vel: 100
   ay: 500
   fan: 2*math.pi
+
+class RadialBlue extends RadialSpark
+  default_particle: particles.BlueSpark
+  rate: 0.03
+  per_frame: 4
+  amount: 8
+  life: 0.1
 

@@ -32,11 +32,12 @@ class Player extends Entity
   watch_class self
 
   controls: {
-    shoot: " "
+    shoot_one: "x"
+    shoot_two: "c"
   }
 
-  speed: 100
-  decay_speed: 100*3
+  speed: 80
+  decay_speed: 100*4
   accel: 20
 
   w: 12
@@ -44,13 +45,6 @@ class Player extends Entity
 
   ox: 2
   oy: 8
-
-  fire_rate: 0.3
-
-  shoot_points: {
-    -- {0,-2}, {9, -2}
-    {4, 0}
-  }
 
   cell_id: 0
   max_health: 100
@@ -67,6 +61,11 @@ class Player extends Entity
     @movement_lock = 0
     @health = @max_health
 
+    @guns = {
+      alpha: guns.Alpha self
+      beta: guns.Beta self
+    }
+
   draw: =>
     @bullets\draw!
 
@@ -76,17 +75,6 @@ class Player extends Entity
       @sprite\draw_cell @cell_id, @box.x - @ox, @box.y - @oy
 
     -- @box\outline!
-
-  shoot: =>
-    pt = @shoot_points[@cur_point]
-
-    x, y = @box.x + pt[1], @box.y + pt[2]
-    emitters.ShootBlue\add @world, x, y
-
-    @bullets\add Bullet, x, y
-
-    @cur_point += 1
-    @cur_point = 1  if @cur_point > #@shoot_points
 
   take_hit: (damage) =>
     return if @health <= 0 -- already dead
@@ -121,7 +109,6 @@ class Player extends Entity
     @bullets\update dt, @world
     @effects\update dt
 
-
     if @death_emitters
       cx, cy = @box\center!
       running = @death_emitters.all (e) ->
@@ -147,6 +134,11 @@ class Player extends Entity
             @take_hit 80
             @velocity = e.box\vector_to(@box)\normalized! * 100
             e\die!
+
+      -- powerups
+      for p in *@world.powerups
+        if p.alive and @box\touches_box p.box
+          p\on_pickup self
 
     -- movement
     if @movement_lock != nil
@@ -178,9 +170,11 @@ class Player extends Entity
 
     if @movement_lock == 0
       -- see if we are shooting
-      if keyboard.isDown @controls.shoot
-        t = timer.getTime!
-        if t - @last_shot > @fire_rate
-          @shoot!
-          @last_shot = t
+      @guns.alpha\shoot! if keyboard.isDown @controls.shoot_one
+      @guns.beta\shoot! if keyboard.isDown @controls.shoot_two
+
+      -- t = timer.getTime!
+      -- if t - @last_shot > @fire_rate
+      --   @shoot!
+      --   @last_shot = t
 

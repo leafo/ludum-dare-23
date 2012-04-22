@@ -3,6 +3,7 @@ import graphics, timer, keyboard from love
 
 export *
 
+
 -- convert a percentage coordinate to actual pixel coord
 -- x_pos is from -1 to 1, where 0 is the middle of the field
 get_x_coord = (x_pos, bg, enemy_type) ->
@@ -90,27 +91,31 @@ class EnemyWave extends Sequence
       Vec2d(-0.0, 3.0)
 
     wave = ->
-      send_row = (pos) ->
+      wait 1
+
+      send_row = (pos, etype=Red) ->
         e = nil
         spd = math.random 50, 60
         for i=1,4
-          e = spawn White, pos, straight spd
+          e = spawn etype, pos, straight spd
           wait 0.4
+        e\attach_powerup HealthPowerup
         e
 
-      -- send_row -0.5
-      -- wait 1.0
-      -- wait_enemies { send_row 0.5 }
+      send_row -0.3
+      wait 1.0
+      wait_enemies { send_row 0.3 }
 
       wait_enemies {
         spawn Pink, 0.3, swoop_right
         spawn Pink, -0.3, swoop_left
       }
+
       wait 1.0
 
-      send_row -0.3
+      send_row -0.3, White
       wait 1.0
-      send_row 0.3
+      send_row 0.3, White
 
       again!
 
@@ -149,11 +154,15 @@ class Enemy extends Entity
     @velocity = Vec2d 0, 50
 
     @health = 100
+    @powerup = nil
 
     if @effects
       @effects\clear self
     else
       @effects = EffectList self
+
+  attach_powerup: (pclass) =>
+    @powerup = pclass
 
   update: (dt) =>
     @effects\update dt
@@ -175,11 +184,15 @@ class Enemy extends Entity
     @box\above_of v or v\touches_box @box
 
   die: =>
+    cx, cy = @box\center!
+
+    if @powerup
+      @world.powerups\add @powerup, cx, cy
+
     @health = 0 if @health > 0
     @velocity[2] /= 2
     @effects\add effects.Death 1.0
 
-    cx, cy = @box\center!
     emitters.Explosion\add w, cx, cy
     @death_emitter = with emitters.PourSmoke\add @world, cx, cy
       .attach = self
