@@ -22,6 +22,7 @@ class Bullet extends Box
       Bullet.sprite = with Spriter imgfy"img/sprite.png", 16, 20
         .oy = 20
 
+    @hits = nil
     @vel = Vec2d vx, vy if vx
     super x, y, @w, @h
 
@@ -33,7 +34,7 @@ class Bullet extends Box
     Bullet.sprite\draw_cell @cell_id, @x - @ox, @y - @oy
     @outline!
 
-  hit_enemy: =>
+  on_hit: =>
     @alive = false
 
 class AnimBullet extends Bullet
@@ -52,8 +53,13 @@ class AnimBullet extends Bullet
 class SimpleBullet extends AnimBullet
   nil
 
-class AbsorbBullet extends Bullet
-  nil
+class AbsorbBullet extends AnimBullet
+  damage: 1
+  seq: {7, 8, 9}
+
+  on_hit: =>
+    game.world.bg\feed_energy 2
+    super!
 
 class EnemyBullet extends AnimBullet
   damage: 20
@@ -67,7 +73,7 @@ class EnemyBullet extends AnimBullet
 
 class Gun
   bullet_type: SimpleBullet
-  curr_level: 2
+  curr_level: 1
   rate: 0.5
 
   shoot_points: { {1, -4} }
@@ -114,5 +120,4 @@ class Alpha extends Gun
 
 class Beta extends Gun
   bullet_type: AbsorbBullet
-  shoot: => print "shooting beta!"
 

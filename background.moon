@@ -111,7 +111,8 @@ class Background
   new: (@viewport) =>
     @update_box!
 
-    @crush_speed = 2
+    @crush_speed = 0.1
+    @energy = 0
 
     @tile = imgfy"img/tile.png"
     @tile\set_wrap "repeat", "repeat"
@@ -168,6 +169,9 @@ class Background
         @viewport.w - 2 * (@padding + @collide_padding), @viewport.h
       @last_padding = @padding
 
+  feed_energy: (amount) =>
+    @energy += amount
+
   update: (dt) =>
     @elapsed += dt
     @effect\send "time", @elapsed
@@ -179,7 +183,16 @@ class Background
     @stars2\update dt
     @terrain\update dt
 
-    -- @padding += @crush_speed*dt
+    -- feed the wall
+    if @energy > 0
+      @padding -= @energy * 8 * dt
+      @energy -= dt * 16
+      @padding = math.max @min_padding, @padding
+
+    @padding += @crush_speed*dt
+    @padding = math.min @max_padding, @padding
+
+    @crush_speed += dt / 30
 
     @update_box!
 

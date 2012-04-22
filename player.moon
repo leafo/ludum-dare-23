@@ -133,7 +133,7 @@ class Player extends Entity
           for b in *@bullets
             if b.alive and b\touches_box e.box
               e\take_hit b
-              b.alive = false
+              b\on_hit!
 
           -- see if we are hitting enemy
           if @movement_lock == 0 and @box\touches_box e.box
@@ -150,7 +150,7 @@ class Player extends Entity
       for b in *@world.enemy_bullets
         if b.alive and @box\touches_box b
           @take_hit b.damage
-          b.alive = false
+          b\on_hit!
 
     -- movement
     if @movement_lock != nil
@@ -180,7 +180,7 @@ class Player extends Entity
       @take_hit 5
       @velocity[1] = -@velocity[1]
 
-    if @movement_lock == 0
+    if @movement_lock == 0 and @health > 0
       -- see if we are shooting
       @guns.alpha\shoot! if keyboard.isDown @controls.shoot_one
       @guns.beta\shoot! if keyboard.isDown @controls.shoot_two

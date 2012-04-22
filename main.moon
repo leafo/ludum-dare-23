@@ -115,7 +115,8 @@ love.load = ->
   love.mousepressed = (x,y, button) ->
     if game
       x, y = game.viewport\unproject x, y
-      game.world.enemy_bullets\add EnemyBullet, x, y, 0, 30
+      game.world.bg\feed_energy 3
+      -- game.world.enemy_bullets\add EnemyBullet, x, y, 0, 30
       -- game.world.powerups\add HealthPowerup, x, y
       -- emitters.PourSmoke\add w, x, y
 
