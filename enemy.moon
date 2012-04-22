@@ -31,7 +31,6 @@ get_x_coord = (x_pos, bg, enemy_type) ->
 
   space = max_x - min_x
   if space <= enemy_type.w
-    print "oops enemy can't fit"
     return nil
 
   x_pos = (x_pos + 1) / 2
@@ -75,7 +74,13 @@ class EnemyWave extends Sequence
   new: (@world, @enemy_list, @wave) =>
     scope = setmetatable {
       spawn: (cls, x_pos=0, ai=nil) ->
-        x = get_x_coord x_pos, @world.bg, cls
+        -- try to find a place to spawn
+        x = nil
+        while true
+          x = get_x_coord x_pos, @world.bg, cls
+          break if x
+          coroutine.yield!
+
         @enemy_list\add cls, @world, x, -20, ai
 
       -- have to be careful about reusing enemies
@@ -265,13 +270,9 @@ class White extends Enemy
 
 class Red2 extends Red
   shoot_template: ->
-    print "starting pattern"
     wait 1.0
-
     fire -30
     fire 30
-
     wait 1.0
-
     again!
 

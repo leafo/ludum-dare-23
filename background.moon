@@ -4,6 +4,7 @@ import mouse from love
 
 export *
 
+
 class Paralax
   speed: 4
   scale: 0.5
@@ -100,12 +101,17 @@ class Background
   watch_class self
 
   height: 200
-  padding: 3
+  padding: 5
 
-  collide_padding: 2
+  min_padding: 5
+  max_padding: 47
+
+  collide_padding: 1
 
   new: (@viewport) =>
     @update_box!
+
+    @crush_speed = 2
 
     @tile = imgfy"img/tile.png"
     @tile\set_wrap "repeat", "repeat"
@@ -141,6 +147,17 @@ class Background
       }
     ]]
 
+  -- try to make the entity fit
+  -- return false if there is no room
+  reposition_entity: (entity) =>
+    return false if entity.w >= @box.w
+    cx = entity.box\center!
+    if cx < 0
+      entity.box.x = @box.x + 0.1
+    else
+      entity.box.x = @box.x + @box.w - entity.w - 0.1
+    true
+
   collides: (thing) =>
     return false unless @box
     not @box\contains_box thing.box
@@ -162,8 +179,7 @@ class Background
     @stars2\update dt
     @terrain\update dt
 
-    -- x = @viewport\unproject mouse.getPosition!
-    -- @padding = 50 * x / @viewport.w
+    -- @padding += @crush_speed*dt
 
     @update_box!
 

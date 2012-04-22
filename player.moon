@@ -40,11 +40,11 @@ class Player extends Entity
   decay_speed: 100*6
   accel: 20
 
-  w: 12
-  h: 12
+  w: 6
+  h: 9
 
-  ox: 2
-  oy: 8
+  ox: 5
+  oy: 10
 
   cell_id: 0
   max_health: 100
@@ -66,6 +66,10 @@ class Player extends Entity
       beta: guns.Beta self
     }
 
+  on_stuck: =>
+    if not @world.bg\reposition_entity self
+      @die!
+
   draw: =>
     @bullets\draw!
 
@@ -83,13 +87,14 @@ class Player extends Entity
 
     if @health <= 0
       @die!
-      -- goto gameover
     else
       @movement_lock = 0.1
       @effects\add effects.Flash 0.2
       @world.viewport\shake!
 
   die: =>
+    return if @health <= 0 -- already dead!
+
     @health = 0 if @health > 0
 
     @movement_lock = nil -- STOP!!
@@ -179,9 +184,4 @@ class Player extends Entity
       -- see if we are shooting
       @guns.alpha\shoot! if keyboard.isDown @controls.shoot_one
       @guns.beta\shoot! if keyboard.isDown @controls.shoot_two
-
-      -- t = timer.getTime!
-      -- if t - @last_shot > @fire_rate
-      --   @shoot!
-      --   @last_shot = t
 
