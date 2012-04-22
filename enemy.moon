@@ -3,6 +3,23 @@ import graphics, timer, keyboard from love
 
 export *
 
+class ShootPattern extends Sequence
+  new: (@enemy, fn) =>
+    world = @enemy.world
+
+    scope = setmetatable {
+      fire: (deg, speed=40) ->
+        deg += 90 -- default to down
+        vx, vy = unpack (speed * Vec2d.from_angle deg) + @enemy.velocity
+
+        cx, cy = @enemy.box\center!
+        b = EnemyBullet
+        world.enemy_bullets\add b, cx - b.w / 2, cy - b.h / 2, vx, vy
+
+    }, __index: Sequence.default_scope
+
+    fn = fn or -> error "must supply pattern"
+    super fn, scope
 
 -- convert a percentage coordinate to actual pixel coord
 -- x_pos is from -1 to 1, where 0 is the middle of the field
@@ -93,6 +110,10 @@ class EnemyWave extends Sequence
     wave = ->
       wait 1
 
+      wait_enemies {
+        spawn enemies.Red2, 0, straight 50
+      }
+
       send_row = (pos, etype=Red) ->
         e = nil
         spd = math.random 50, 60
@@ -161,6 +182,11 @@ class Enemy extends Entity
     else
       @effects = EffectList self
 
+    if @shoot_template
+      @pattern = ShootPattern self, @shoot_template
+    else
+      @pattern = nil
+
   attach_powerup: (pclass) =>
     @powerup = pclass
 
@@ -179,6 +205,8 @@ class Enemy extends Entity
       cx, cy = @box\center!
       @death_emitter.x = cx
       @death_emitter.y = cy
+
+    @pattern\update dt if @pattern and @health > 0
 
     -- are they in the world?
     @box\above_of v or v\touches_box @box
@@ -235,4 +263,15 @@ class White extends Enemy
   ox: 4
   oy: 6
 
+class Red2 extends Red
+  shoot_template: ->
+    print "starting pattern"
+    wait 1.0
+
+    fire -30
+    fire 30
+
+    wait 1.0
+
+    again!
 

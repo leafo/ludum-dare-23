@@ -50,6 +50,9 @@ class World
   new: (@viewport) =>
     @bg = Background @viewport
     @enemies = ReuseList!
+
+    @enemy_bullets = ReuseList!
+
     @spawner = EnemyWave self, @enemies
     @powerups = ReuseList!
 
@@ -57,6 +60,7 @@ class World
     @bg\draw!
     @enemies\draw!
     @powerups\draw!
+    @enemy_bullets\draw!
     Emitter\draw_all!
 
   update: (dt) =>
@@ -65,6 +69,7 @@ class World
     @spawner\update dt
     @enemies\update dt
     @powerups\update dt
+    @enemy_bullets\update dt, self
     @bg\update dt
 
   collides: (thing) =>
@@ -110,7 +115,8 @@ love.load = ->
   love.mousepressed = (x,y, button) ->
     if game
       x, y = game.viewport\unproject x, y
-      game.world.powerups\add HealthPowerup, x, y
+      game.world.enemy_bullets\add EnemyBullet, x, y, 0, 30
+      -- game.world.powerups\add HealthPowerup, x, y
       -- emitters.PourSmoke\add w, x, y
 
   love.keypressed = (key, code) ->

@@ -6,37 +6,67 @@ export *
 
 class Bullet extends Box
   self.sprite = nil
+
   vel: Vec2d 0, -140
+  cell_id: 0
 
   ox: 1
   oy: 2
+  w: 3
+  h: 8
 
   damage: 166
 
-  new: (x, y) =>
+  new: (x, y, vx, vy) =>
     if not Bullet.sprite
       Bullet.sprite = with Spriter imgfy"img/sprite.png", 16, 20
         .oy = 20
 
-    @anim = @anim or Animator Bullet.sprite, {0, 1, 2}, 0.2
-    super x, y, 3, 8
+    @vel = Vec2d vx, vy if vx
+    super x, y, @w, @h
 
   update: (dt, world) =>
     @move unpack @vel * dt
-    @anim\update dt
     world.viewport\contains_box self
 
   draw: =>
-    @anim\draw @x - @ox, @y - @oy
+    Bullet.sprite\draw_cell @cell_id, @x - @ox, @y - @oy
+    @outline!
 
   hit_enemy: =>
     @alive = false
 
+class AnimBullet extends Bullet
+  seq: {0, 1, 2}
+  new: (...) ->
+    super ...
+    @anim = Animator Bullet.sprite, @seq, 0.2
+
+  update: (dt, world) =>
+    @anim\update dt
+    super dt, world
+
+  draw: =>
+    @anim\draw @x - @ox, @y - @oy
+
+class SimpleBullet extends AnimBullet
+  nil
+
 class AbsorbBullet extends Bullet
   nil
 
+class EnemyBullet extends AnimBullet
+  damage: 20
+  seq: { 3 ,4 }
+
+  ox: 3
+  oy: 3
+
+  w: 2
+  h: 2
+
 class Gun
-  bullet_type: Bullet
+  bullet_type: SimpleBullet
   curr_level: 1
   rate: 0.5
 

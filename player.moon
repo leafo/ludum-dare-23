@@ -120,6 +120,7 @@ class Player extends Entity
 
     -- collide
     if @health > 0
+      -- enemies
       for e in *@world.enemies
         if e.alive and e.health > 0
 
@@ -139,6 +140,12 @@ class Player extends Entity
       for p in *@world.powerups
         if p.alive and @box\touches_box p.box
           p\on_pickup self
+
+      -- enemy bullets
+      for b in *@world.enemy_bullets
+        if b.alive and @box\touches_box b
+          @take_hit b.damage
+          b.alive = false
 
     -- movement
     if @movement_lock != nil
