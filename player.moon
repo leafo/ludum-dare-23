@@ -37,7 +37,7 @@ class Player extends Entity
   }
 
   speed: 80
-  decay_speed: 100*4
+  decay_speed: 100*6
   accel: 20
 
   w: 12
