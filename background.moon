@@ -56,6 +56,8 @@ class Background
   collide_padding: 2
 
   new: (@viewport) =>
+    @update_box!
+
     @tile = imgfy"img/tile.png"
     @tile\set_wrap "repeat", "repeat"
 
@@ -94,6 +96,12 @@ class Background
     return false unless @box
     not @box\contains_box thing.box
 
+  update_box: =>
+    if @padding != @last_padding
+      @box = Box @padding + @collide_padding, 0,
+        @viewport.w - 2 * (@padding + @collide_padding), @viewport.h
+      @last_padding = @padding
+
   update: (dt) =>
     @elapsed += dt
     @effect\send "time", @elapsed
@@ -105,8 +113,7 @@ class Background
     -- x = @viewport\unproject mouse.getPosition!
     -- @padding = 50 * x / @viewport.w
 
-    @box = Box @padding + @collide_padding, 0,
-      @viewport.w - 2 * (@padding + @collide_padding), @viewport.h
+    @update_box!
 
   draw: =>
     @stars\draw!

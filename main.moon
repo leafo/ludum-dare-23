@@ -49,7 +49,7 @@ class World
   new: (@viewport) =>
     @bg = Background @viewport
     @enemies = ReuseList!
-    @spawner = RandomEnemySpanwer self, @enemies
+    @spawner = EnemyWave self, @enemies
 
   draw: =>
     @bg\draw!
@@ -116,6 +116,7 @@ love.load = ->
 
     if Emitter.emitter_list
       g.print tostring(#Emitter.emitter_list), 2, 12
+      g.print tostring(#Emitter.draw_list), 2, 22
 
     viewport\pop!
 
