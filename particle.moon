@@ -112,8 +112,9 @@ class Emitter
   default_particle: Particle
 
   new: (@world, @x, @y, @particle_cls=@default_particle) =>
-    if not Emitter.draw_list
+    if not @draw_list
       Emitter.draw_list = ReuseList!
+      Emitter.__base.draw_list = Emitter.draw_list
 
     @attach = nil -- attached to some object?
     @amount = @@amount
@@ -124,9 +125,9 @@ class Emitter
     dir = @dir + (math.random! - 0.5) * @fan
     dx, dy = math.cos(dir), math.sin(dir)
 
-    Emitter.draw_list\add @particle_cls, @x, @y, dx*@vel, dy*@vel, dx*@ax, dy*@ay
+    @draw_list\add @particle_cls, @x, @y, dx*@vel, dy*@vel, dx*@ax, dy*@ay
 
-    @amount -= 1
+    @amount -= 1 if @amount != nil
 
   update: (dt) =>
     @time += dt
@@ -135,7 +136,7 @@ class Emitter
         @spawn!
       @time -= @rate
 
-    @amount > 0
+    @amount == nil or @amount > 0
 
 module "particles", package.seeall
 

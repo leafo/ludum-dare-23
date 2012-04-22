@@ -14,12 +14,12 @@ export n = (thing) ->
   else
     tostring thing
 
+require "particle"
 require "guns"
 require "player"
 require "background"
 require "effects"
 require "enemy"
-require "particle"
 
 require "lovekit.screen_snap"
 
@@ -80,8 +80,8 @@ love.load = ->
   g.setFont font
 
   love.mousepressed = (x,y, button) ->
-    x, y = viewport\unproject x, y
-    emitters.PourSmoke\add w, x, y
+    -- x, y = viewport\unproject x, y
+    -- emitters.PourSmoke\add w, x, y
 
   love.keypressed = (key, code) ->
     switch key

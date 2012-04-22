@@ -28,6 +28,7 @@ class Paralax
     @img\drawq @quad, 0, @offset - @viewport.h
     @img\drawq @quad, 0, @offset
 
+-- this is useless
 class MultiParalax extends Paralax
   new: (imgs, viewport, opts) =>
     @imgs = for img in *imgs
@@ -46,6 +47,54 @@ class MultiParalax extends Paralax
   draw: =>
     @img\drawq @quad, 0, @offset - @viewport.h
     @img2\drawq @quad, 0, @offset
+
+
+class SpaceParticle extends Particle
+  new: (...) =>
+    super ...
+    for i=1,4
+      @cell_id = math.random 0, 3
+      break if @cell_id != @@last_id
+
+    @@last_id = @cell_id
+    @rot_speed = math.random! / 10
+
+  draw: =>
+    if not @sprite
+      @sprite = Spriter imgfy"img/space_junk.png", 64, 64
+
+    ox, oy = @x + @sprite.cell_w/2, @y + @sprite.cell_h/2
+
+    -- rotate!
+    g.push!
+    g.translate ox, oy
+    g.rotate @time * @rot_speed
+    g.translate -ox, -oy
+
+    @sprite\draw_cell @cell_id, @x, @y
+
+    g.pop!
+
+  update: (dt) =>
+    @time += dt
+    @x += dt * @vx
+    @y += dt * @vy
+    true
+
+class SpaceJunk extends Emitter
+  draw_list: ReuseList!
+
+  amount: nil
+  default_particle: SpaceParticle
+  rate: 3
+  dir: math.pi / 2
+  fan: 0
+  vel: 20
+
+  spawn: (...) =>
+    @x = math.random 10, 40
+    @rate = math.random 2, 5
+    super ...
 
 class Background
   watch_class self
@@ -67,16 +116,16 @@ class Background
       scale: 0.5
     }
 
-    @terrain = MultiParalax {
-      "img/terrain1.png"
-      "img/terrain2.png"
-    }, @viewport, {
+    @terrain = Paralax "img/terrain1.png", @viewport, {
       speed: 32
     }
 
     @span = 1
 
     @elapsed = 0
+
+    @fake_world = { viewport: viewport }
+    @junk = SpaceJunk @fake_world, 25, -64
 
     @effect = g.newPixelEffect [[
       extern number time;
@@ -106,6 +155,9 @@ class Background
     @elapsed += dt
     @effect\send "time", @elapsed
 
+    @junk\update dt
+    @junk.draw_list\update dt, @fake_world
+
     @stars\update dt
     @stars2\update dt
     @terrain\update dt
@@ -118,6 +170,8 @@ class Background
   draw: =>
     @stars\draw!
     @stars2\draw!
+
+    @junk.draw_list\draw!
 
     @terrain\draw!
 
