@@ -58,6 +58,9 @@ class Enemy extends Entity
     @box\above_of v or v\touches_box @box
 
   take_hit: (bullet) =>
+    emitters.HitEnemy\add @world, bullet.x, bullet.y
+
+
     @health -= bullet.damage
     if @health < 0
       @velocity[2] /= 2
