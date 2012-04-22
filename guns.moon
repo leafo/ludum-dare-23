@@ -28,7 +28,7 @@ class Bullet extends Box
 
   update: (dt, world) =>
     @move unpack @vel * dt
-    world.viewport\contains_box self
+    world.bg.box\contains_box self
 
   draw: =>
     Bullet.sprite\draw_cell @cell_id, @x - @ox, @y - @oy

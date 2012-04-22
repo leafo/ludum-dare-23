@@ -86,14 +86,14 @@ class Player extends Entity
     @health = math.max 0, @health - damage
 
     if @health <= 0
-      @die!
+      @die true
     else
       @movement_lock = 0.1
       @effects\add effects.Flash 0.2
       @world.viewport\shake!
 
-  die: =>
-    return if @health <= 0 -- already dead!
+  die: (force=false) =>
+    return if @health <= 0 and not force -- already dead!
 
     @health = 0 if @health > 0
 
