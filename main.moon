@@ -1,7 +1,8 @@
-require "lovekit.all"
 
+export disable_reloader = true
 export watch_class = ->
--- reloader = require "lovekit.reloader"
+
+require "lovekit.all"
 
 slow_mode = false
 
