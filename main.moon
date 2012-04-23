@@ -142,7 +142,7 @@ love.load = ->
   love.mousepressed = (x,y, button) ->
     if game
       x, y = game.viewport\unproject x, y
-      -- game.world.powerups\add GunPowerup, x, y
+      game.world.powerups\add GunPowerup, x, y
       -- game.player\die!
       -- game.world.bg\feed_energy 3
       -- game.world.powerups\add HealthPowerup, x, y

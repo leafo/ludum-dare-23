@@ -58,7 +58,7 @@ class AbsorbBullet extends AnimBullet
   seq: {7, 8, 9}
 
   on_hit: =>
-    game.world.bg\feed_energy 2
+    game.world.bg\feed_energy game.player.guns.beta.power
     super!
 
 class EnemyBullet extends AnimBullet
@@ -108,13 +108,27 @@ class Alpha extends Gun
   levels: {
     {}
     {
+      rate: 0.4
+      shoot_points: {{-2, -3}, {6, -3}} -- wings
+    }
+
+    {
       rate: 0.3
       shoot_points: {{-2, -3}, {6, -3}} -- wings
+    }
+
+    {
+      rate: 0.2
+      shoot_points: {{-2, -3}, {6, -3}, {1, -4}} -- wings
+    }
+
+    {
+      rate: 0.1
+      shoot_points: {{-2, -3}, {6, -3},{1, -4} } -- wings
     }
   }
 
   upgrade: =>
-    print "upgrade alpha"
     @curr_level = math.min @curr_level + 1, #@levels
 
   fire: =>
@@ -127,6 +141,7 @@ class Alpha extends Gun
 
 class Beta extends Gun
   charge_time: 0.5
+  power: 2.0
 
   bullet_type: AbsorbBullet
 
@@ -135,7 +150,8 @@ class Beta extends Gun
     @time = 0
 
   upgrade: =>
-    print "upgrade beta"
+    @charge_time = math.max 0.2, @charge_time - 0.1
+    @power += 0.2
 
   fire: =>
     sfx\play "shoot_2"
