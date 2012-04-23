@@ -152,8 +152,8 @@ class Background
   -- return false if there is no room
   reposition_entity: (entity) =>
     return false if entity.w >= @box.w
-    cx = entity.box\center!
-    if cx < 0
+
+    if entity.box\center! < @box\center!
       entity.box.x = @box.x + 0.1
     else
       entity.box.x = @box.x + @box.w - entity.w - 0.1
