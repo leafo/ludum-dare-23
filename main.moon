@@ -106,7 +106,7 @@ export class Game
     @world\draw!
     @player\draw!
 
-    g.print tostring(timer.getFPS!), 2, 12
+    -- g.print tostring(timer.getFPS!), 2, 12
 
     @hud\draw!
     @viewport\pop!
