@@ -1,7 +1,7 @@
 require "lovekit.all"
 
 export watch_class = ->
-reloader = require "lovekit.reloader"
+-- reloader = require "lovekit.reloader"
 
 slow_mode = false
 
@@ -142,7 +142,7 @@ love.load = ->
   love.mousepressed = (x,y, button) ->
     if game
       x, y = game.viewport\unproject x, y
-      game.world.powerups\add GunPowerup, x, y
+      -- game.world.powerups\add GunPowerup, x, y
       -- game.player\die!
       -- game.world.bg\feed_energy 3
       -- game.world.powerups\add HealthPowerup, x, y
@@ -153,18 +153,18 @@ love.load = ->
 
     switch key
       when "escape" then os.exit!
-      when "d"
-        game.player\die! if game
-      when "XX" -- cool
-        if snapper
-          slow_mode = false
-          snapper = nil
-        else
-          slow_mode = true
-          snapper = ScreenSnap!
-      when "s"
-        slow_mode = not slow_mode
-        print "slow mode:", slow_mode
+      -- when "d"
+      --   game.player\die! if game
+      -- when "XX" -- cool
+      --   if snapper
+      --     slow_mode = false
+      --     snapper = nil
+      --   else
+      --     slow_mode = true
+      --     snapper = ScreenSnap!
+      -- when "s"
+      --   slow_mode = not slow_mode
+      --   print "slow mode:", slow_mode
 
   love.update = (dt) ->
     reloader\update!
