@@ -167,7 +167,7 @@ love.load = ->
       --   print "slow mode:", slow_mode
 
   love.update = (dt) ->
-    reloader\update!
+    -- reloader\update!
     dt /= 3 if slow_mode
     dispatch\update dt
 
