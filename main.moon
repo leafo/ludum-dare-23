@@ -1,6 +1,6 @@
-require "moon"
-
 require "lovekit.all"
+
+export watch_class = ->
 reloader = require "lovekit.reloader"
 
 slow_mode = false
