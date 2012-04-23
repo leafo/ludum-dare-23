@@ -117,6 +117,10 @@ class Alpha extends Gun
     print "upgrade alpha"
     @curr_level = math.min @curr_level + 1, #@levels
 
+  fire: =>
+    sfx\play "shoot"
+    super!
+
   shoot: =>
     @player.guns.beta.time = 0
     super!
@@ -133,11 +137,18 @@ class Beta extends Gun
   upgrade: =>
     print "upgrade beta"
 
+  fire: =>
+    sfx\play "shoot_2"
+    super!
+
   update: (dt, @is_charging) =>
     if @is_charging
+      if @time == 0
+        sfx\play "charge"
+
       @time += dt
       if @time >= @charge_time
-        @time -= @charge_time
+        @time = 0
         @fire!
     else
       @time = dampen @time, @charge_time, dt

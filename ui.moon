@@ -79,6 +79,7 @@ class TitleScreen
       when "return" then @start_game!
 
   start_game: =>
+    sfx\play "start_game"
     export game = Game! -- :)
     dispatch\push_with_effect game, 0.3, fade_effect
 

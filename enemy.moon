@@ -246,6 +246,7 @@ class Enemy extends Entity
     @box\above_of v or v\touches_box @box
 
   die: =>
+    sfx\play "die_enemy"
     cx, cy = @box\center!
 
     if @powerup
@@ -260,6 +261,7 @@ class Enemy extends Entity
       .attach = self
 
   take_hit: (bullet) =>
+    sfx\play "hit_enemy"
     emitters.HitEnemy\add @world, bullet.x, bullet.y
 
     @health -= bullet.damage

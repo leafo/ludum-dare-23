@@ -6,7 +6,7 @@ reloader = require "lovekit.reloader"
 slow_mode = false
 
 g = love.graphics
-import timer, keyboard from love
+import timer, keyboard, audio from love
 
 export n = (thing) ->
   if type(thing) == "table"
@@ -22,6 +22,7 @@ require "effects"
 require "powerups"
 require "enemy"
 require "ui"
+require "audio"
 
 require "lovekit.screen_snap"
 
@@ -113,7 +114,25 @@ snapper = nil
 
 love.load = ->
   export dispatch = Dispatch TitleScreen!
+  export sfx = Audio!
   -- export game = Game!
+
+  music = audio.newSource "audio/theme.ogg"
+  music\setLooping true
+  music\play!
+
+  sfx\preload {
+    "die_enemy"
+    "hit_enemy"
+    "powerup"
+    "shoot"
+    "shoot_2"
+    "charge"
+    "start_game"
+    "die_player"
+    "hit_wall"
+    "hit_player"
+  }
 
   font_image = imgfy"img/font.png"
 
@@ -123,7 +142,7 @@ love.load = ->
   love.mousepressed = (x,y, button) ->
     if game
       x, y = game.viewport\unproject x, y
-      game.world.powerups\add GunPowerup, x, y
+      -- game.world.powerups\add GunPowerup, x, y
       -- game.player\die!
       -- game.world.bg\feed_energy 3
       -- game.world.powerups\add HealthPowerup, x, y

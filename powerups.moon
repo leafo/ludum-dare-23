@@ -36,6 +36,7 @@ class Powerup
 
   on_pickup: (player) =>
     @alive = false
+    sfx\play "powerup"
     emitters.RadialBlue\add player.world, @box\center!
 
 class HealthPowerup extends Powerup

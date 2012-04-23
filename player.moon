@@ -81,8 +81,8 @@ class Player extends Entity
     -- @box\outline!
 
   take_hit: (damage) =>
-    return if true
     return if @health <= 0 -- already dead
+    sfx\play "hit_player"
 
     @health = math.max 0, @health - damage
 
@@ -95,6 +95,7 @@ class Player extends Entity
 
   die: (force=false) =>
     return if @health <= 0 and not force -- already dead!
+    sfx\play "die_player"
 
     @health = 0 if @health > 0
 
@@ -179,6 +180,7 @@ class Player extends Entity
     cx, cy = @fit_move unpack @velocity * dt
     if cx -- hit a wall
       @take_hit 5
+      sfx\play "hit_wall"
       @velocity[1] = -@velocity[1]
 
 
