@@ -172,6 +172,12 @@ class EnemyWave extends Sequence
       wait 1.0
       send_row 0.3, White
 
+      for i= 1,4
+        spawn enemies.Pink2, math.random! - 0.5, straight 30
+        wait 1.0
+
+      wait_enemies { send_row 0.0, Pink2 }
+
       again!
 
     super wave, scope
@@ -312,4 +318,10 @@ class White2 extends White
   shoot_template: ->
     wait 0.5
     fan_bullets -60, 60, nil, 4
+
+
+class Pink2 extends Pink
+  shoot_template: ->
+    wait 0.2
+    fan_bullets -80, 80, nil, 6
 
