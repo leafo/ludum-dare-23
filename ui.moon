@@ -86,6 +86,7 @@ class TitleScreen
   draw: =>
     @viewport\apply!
     @img\draw 0, 0
+    @viewport\pop!
 
 class GameOver
   watch_class self
@@ -107,6 +108,7 @@ class GameOver
 
     g.print tostring(@score), 45, 43
     g.print tostring(@time), 45, 56
+    @viewport\pop!
 
 class Pause
   nil
