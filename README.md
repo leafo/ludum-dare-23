@@ -10,6 +10,12 @@ DON'T STOP MOVING. Fly through an interstellar grand canyon as the walls slowly
 close in on you. Destroy wave after wave of enemies trying to get you. Dual
 weapon gameplay, one for killing and another for pushing the walls back.
 
+Screenshots
+-------------
+
+![Gif](http://leafo.net/dump/tiny4.gif)
+
+![Title](http://leafo.net/shotsnb/2012-04-22_02-09-59.png)
 
 How To Play
 -------------
@@ -38,13 +44,6 @@ of your health. The blue powerup will improve both of your guns.
 
 Try to get the blue powerups whenever possible, this will improve your Beta gun
 so you can push the walls back when they start to close in really fast.
-
-Screenshots
--------------
-
-![Gif](http://leafo.net/dump/tiny4.gif)
-
-![Title](http://leafo.net/shotsnb/2012-04-22_02-09-59.png)
 
 About
 -------
